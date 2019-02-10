@@ -24,6 +24,7 @@ class presenter {
             ([this]{
                  _before_close();
                  _presenter = Presenter();
+                 return false;
              });
     }
     

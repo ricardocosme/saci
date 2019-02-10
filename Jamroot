@@ -1,0 +1,27 @@
+import os ;
+import testing ;
+
+local boost_root_path = [ os.environ BOOST_ROOT ] ;
+if ! $(boost_root_path)
+{ boost_root_path = "../boost" ; }
+
+local coruja_root_path = [ os.environ CORUJA_ROOT ] ;
+if ! $(coruja_root_path)
+{ coruja_root_path = "../coruja" ; }
+
+local range_v3_root_path = [ os.environ RANGE_V3_ROOT ] ;
+if ! $(range_v3_root_path)
+{ range_v3_root_path = "../range_v3" ; }
+
+use-project coruja : $(boost_root_path) ;
+
+project saci
+  : requirements
+    <include>include
+    <include>$(coruja_root_path)/include
+    <include>$(range_v3_root_path)/include
+    <cxxflags>-std=c++11
+    <use>/boost//headers
+  ;
+  
+run test/move.cpp ;
