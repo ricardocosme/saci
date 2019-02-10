@@ -29,7 +29,7 @@ public:
         if(!_presenter) {
             std::unique_ptr<Presenter> o(
                 new Presenter(std::forward<Args>(args)...));
-            o->onClose([this]{ _presenter.release(); });
+            o->onClose([this]{ _presenter.reset(); });
             _presenter = std::move(o);
         }
         return *_presenter;
