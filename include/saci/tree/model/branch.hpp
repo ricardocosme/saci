@@ -66,7 +66,14 @@ struct branch_node : branch_base<Parent, CheckPolicy, Expandable, T>
     {boost::fusion::for_each(children, detail::init_children<branch_node>{*this});}
     
     branch_node(branch_node&&) = delete;
-    branch_node& operator=(branch_node&&) = delete;
+    
+    branch_node& operator=(branch_node&& rhs) {
+        base::operator=(std::move(rhs));
+        children = std::move(rhs.children);
+        boost::fusion::for_each
+            (children, detail::update_parent_ptr<branch_node>{*this});
+        return *this;
+    }
     
     void update_parent_ptr(Parent& p) {
         base::update_parent_ptr(p);
@@ -116,7 +123,13 @@ struct collection_branch_node_impl
     }
     
     collection_branch_node_impl(collection_branch_node_impl&&) = delete;
-    collection_branch_node_impl& operator=(collection_branch_node_impl&&) = default;
+    collection_branch_node_impl& operator=(collection_branch_node_impl&& rhs) {
+        base::operator=(std::move(rhs));
+        children = std::move(rhs.children);
+        detail::update_parent_ptr<collection_branch_node_impl>
+            {*this}(children);
+        return *this;
+    }
     
     void update_parent_ptr(Parent& p) {
         base::update_parent_ptr(p);
@@ -179,6 +192,9 @@ struct collection_branch_node_children_impl
         boost::fusion::for_each
             (children,
              detail::assign_sync_with_domain_t<collection_branch_node_children_impl>{*this});
+        boost::fusion::for_each
+            (children, detail::update_parent_ptr
+             <collection_branch_node_children_impl>{*this});
         return *this;
     }
     

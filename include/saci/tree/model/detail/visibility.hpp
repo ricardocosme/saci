@@ -81,7 +81,7 @@ struct visibility<Derived, Checkable, Parent> {
 
     visibility& operator=(visibility&& rhs) {
         check = std::move(rhs.check);
-        visible = std::move(rhs.visible);
+        visible = check;
         return *this;
     }
     
