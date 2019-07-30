@@ -38,8 +38,7 @@ public:
     
     presenter& operator=(presenter&& rhs) {
         _presenter = std::move(rhs._presenter);
-        register_onclose();
-        
+        if(!!*this) register_onclose();
         return *this;
     }
     
@@ -49,8 +48,8 @@ public:
     Presenter* operator->() const noexcept
     { return &const_cast<Presenter&>(_presenter); }
 
-    bool operator!() const noexcept
-    { return _presenter == Presenter(); }
+    operator bool() const noexcept
+    { return _presenter != Presenter(); }
 
     template<typename F>
     coruja::any_connection before_close(F&& f)

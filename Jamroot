@@ -13,8 +13,23 @@ local range_v3_root_path = [ os.environ RANGE_V3_ROOT ] ;
 if ! $(range_v3_root_path)
 { range_v3_root_path = "../range_v3" ; }
 
+local qt_root_path = [ os.environ QT_ROOT ] ;
+if ! $(qt_root_path)
+{ qt_root_path = "../qt" ; }
+
 use-project coruja : $(boost_root_path) ;
 
+project Qt
+  : requirements
+     <include>$(qt_root_path)/include
+     <include>$(qt_root_path)/include/QtGui
+     <include>$(qt_root_path)/include/QtCore
+     <search>$(qt_root_path)/lib
+  ;
+
+lib QtCore ;
+lib QtGui ;
+  
 project saci
   : requirements
     <include>include
@@ -25,3 +40,39 @@ project saci
   ;
   
 run test/move.cpp ;
+
+exe tree_qt
+  : demo/tree/qt/main.cpp
+  : <library>/Qt//QtCore
+    <library>/Qt//QtGui
+  ;
+explicit tree_qt ;
+
+exe radio_btn_qt
+  : demo/radio_btn/qt/main.cpp
+  : <library>/Qt//QtCore
+    <library>/Qt//QtGui
+  ;
+explicit radio_btn_qt ;
+
+exe checkbox_qt
+  : demo/checkbox/qt/main.cpp
+  : <library>/Qt//QtCore
+    <library>/Qt//QtGui
+  ;
+explicit checkbox_qt ;
+
+exe spinbox_qt
+  : demo/spinbox/qt/main.cpp
+  : <library>/Qt//QtCore
+    <library>/Qt//QtGui
+  ;
+explicit spinbox_qt ;
+
+install stage
+  : tree_qt
+    radio_btn_qt
+    checkbox_qt
+    spinbox_qt
+  ;
+  
