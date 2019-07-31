@@ -1,11 +1,12 @@
 #pragma once
 
+#include "saci/tree/model/detail/expand.hpp"
 #include "saci/tree/model/detail/node_impl_fwd.hpp"
 #include "saci/tree/model/detail/sync_with_domain.hpp"
-#include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/tag.hpp"
-#include "saci/tree/model/detail/expand.hpp"
+#include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/visibility.hpp"
+#include "saci/tree/model/detail/with_ctx_base.hpp"
 
 #include <coruja/container/list.hpp>
 #include <coruja/object/object.hpp>
@@ -26,8 +27,7 @@ template<typename T, typename CheckPolicy, typename Child,
 struct root;
 
 template<typename T, typename CheckPolicy, typename Child>
-struct root<T, CheckPolicy, Child,
-            typename std::enable_if<std::is_base_of<detail::with_ctx_base, T>::value>::type>
+struct root<T, CheckPolicy, Child, detail::enable_if_ctx<T>>
     : coruja::observer_class<root<T, CheckPolicy, Child>,
                              detail::visibility<root<T, CheckPolicy, Child>,
                                                 CheckPolicy>>
@@ -75,8 +75,7 @@ struct root<T, CheckPolicy, Child,
 //collection_branch_node sem pai. Avaliar a versão de root que é
 //análoga a branch_node sem pai.(Considerar root como tag e usar node_impl)
 template<typename T, typename CheckPolicy, typename Child>
-struct root<T, CheckPolicy, Child,
-            typename std::enable_if<!std::is_base_of<detail::with_ctx_base, T>::value>::type>
+struct root<T, CheckPolicy, Child, detail::enable_if_not_ctx<T>>
     : coruja::observer_class<root<T, CheckPolicy, Child>,
                              detail::visibility<root<T, CheckPolicy, Child>,
                                                 CheckPolicy>>

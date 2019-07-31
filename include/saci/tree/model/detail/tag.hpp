@@ -7,7 +7,5 @@ struct tag_branches {};
 struct tag_leaf{};
 struct tag_leaves{};
 
-struct with_ctx_base {};
-
 }}}
 
