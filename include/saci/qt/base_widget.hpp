@@ -19,6 +19,7 @@ class base_widget
     QtWidget* _widget{nullptr};
     coruja::scoped_any_connection _conn;
     ViewToModel _view_to_model;
+    std::string _sig, _slot;
 public:
     base_widget() = default;
 
@@ -30,11 +31,18 @@ public:
                 UpdateModel update_model)
         : _widget(&widget)
         , _view_to_model(model)
+        , _sig(std::move(sig))
+        , _slot(std::move(slot))
     {
-        _conn = model.for_each([&](T v)
+        _conn = model.for_each([&widget, update_model](T v)
         { update_model(widget, v); });
         _view_to_model.conn = _conn.get();
-        QObject::connect(_widget, sig.c_str(), &_view_to_model, slot.c_str());
+        QObject::connect(_widget, _sig.c_str(), &_view_to_model, _slot.c_str());
+    }
+
+    ~base_widget() {
+        QObject::disconnect(_widget, _sig.c_str(),
+                            &_view_to_model, _slot.c_str());
     }
     
     const QtWidget& widget() const noexcept
