@@ -22,22 +22,30 @@ struct with_ctx : detail::with_ctx_base {
     using ctx_t = Context;
 };
 
-template<typename T, typename CheckPolicy, typename Child,
+template<typename T,
+         typename CheckPolicy,
+         typename Children,
          typename Enable = void>
 struct root;
 
-template<typename T, typename CheckPolicy, typename Child>
-struct root<T, CheckPolicy, Child, detail::enable_if_ctx<T>>
-    : coruja::observer_class<root<T, CheckPolicy, Child>,
-                             detail::visibility<root<T, CheckPolicy, Child>,
-                                                CheckPolicy>>
+template<typename T,
+         typename CheckPolicy,
+         typename Children>
+struct root<T,
+            CheckPolicy,
+            Children,
+            detail::enable_if_ctx<T>
+> : coruja::observer_class<
+        root<T, CheckPolicy, Children>,
+        detail::visibility<root<T, CheckPolicy, Children>, CheckPolicy>>
 {
-    using base = coruja::observer_class<root, detail::visibility<root, CheckPolicy>>;
+    using base = coruja::observer_class<
+        root, detail::visibility<root, CheckPolicy>>;
     using type = typename T::type;
     using ctx_t = typename T::ctx_t;
     using check_t = CheckPolicy;
     using expand_t = Expandable;
-    using children_t = typename detail::node_impl<root, Child>::type;
+    using children_t = typename detail::node_impl<root, Children>::type;
     using child = typename children_t::value_type;
     
     root() = default;
@@ -45,7 +53,7 @@ struct root<T, CheckPolicy, Child, detail::enable_if_ctx<T>>
         : base()
         , obj(&pobj)
         , ctx(&pctx)
-    { sync_with_domain(*this, pobj); }
+    { detail::sync_with_domain(*this, pobj); }
     
     root(root&& rhs)
         : base(std::move(rhs))
@@ -74,18 +82,24 @@ struct root<T, CheckPolicy, Child, detail::enable_if_ctx<T>>
 //TODO Contemplar mais de um filho. root reflete um
 //collection_branch_node sem pai. Avaliar a versão de root que é
 //análoga a branch_node sem pai.(Considerar root como tag e usar node_impl)
-template<typename T, typename CheckPolicy, typename Child>
-struct root<T, CheckPolicy, Child, detail::enable_if_not_ctx<T>>
-    : coruja::observer_class<root<T, CheckPolicy, Child>,
-                             detail::visibility<root<T, CheckPolicy, Child>,
-                                                CheckPolicy>>
+template<typename T,
+         typename CheckPolicy,
+         typename Children>
+struct root<T,
+            CheckPolicy,
+            Children,
+            detail::enable_if_not_ctx<T>
+> : coruja::observer_class<
+        root<T, CheckPolicy, Children>,
+        detail::visibility<root<T, CheckPolicy, Children>, CheckPolicy>>
 {
-    using base = coruja::observer_class<root, detail::visibility<root, CheckPolicy>>;
+    using base = coruja::observer_class<
+        root, detail::visibility<root, CheckPolicy>>;
     using type = T;
     using ctx_t = void;
     using check_t = CheckPolicy;
     using expand_t = Expandable;
-    using children_t = typename detail::node_impl<root, Child>::type;
+    using children_t = typename detail::node_impl<root, Children>::type;
     using child = typename children_t::value_type;
     
     root() = default;

@@ -10,7 +10,9 @@ struct Checkable {};
 
 namespace detail {
 
-template<typename Derived, typename Policy, typename Parent = void>
+template<typename Derived,
+         typename CheckPolicy,
+         typename Parent = void>
 struct visibility;
 
 template<typename Derived>
