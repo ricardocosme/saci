@@ -22,8 +22,8 @@ class base_widget
 public:
     base_widget() = default;
 
-    template<typename Model, typename UpdateModel>
-    base_widget(Model& model,
+    template<typename ObservableObject, typename UpdateModel>
+    base_widget(ObservableObject& model,
                 QtWidget& widget,
                 std::string sig,
                 std::string slot,

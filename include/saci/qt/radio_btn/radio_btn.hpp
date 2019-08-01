@@ -26,8 +26,8 @@ struct radio_btn
     
     radio_btn() = default;
 
-    template<typename Model>
-    radio_btn(Model& model, QRadioButton& widget)
+    template<typename ObservableObject>
+    radio_btn(ObservableObject& model, QRadioButton& widget)
         : base(model,
                widget,
                SIGNAL(toggled(bool)),

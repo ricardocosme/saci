@@ -26,8 +26,8 @@ struct checkbox
     
     checkbox() = default;
 
-    template<typename Model>
-    checkbox(Model& model, QCheckBox& widget)
+    template<typename ObservableObject>
+    checkbox(ObservableObject& model, QCheckBox& widget)
         : base(model,
                widget,
                SIGNAL(stateChanged(int)),

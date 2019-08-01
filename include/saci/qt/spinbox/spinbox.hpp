@@ -26,8 +26,8 @@ struct spinbox
     
     spinbox() = default;
 
-    template<typename Model>
-    spinbox(Model& model, QDoubleSpinBox& widget)
+    template<typename ObservableObject>
+    spinbox(ObservableObject& model, QDoubleSpinBox& widget)
         : base(model,
                widget,
                SIGNAL(valueChanged(double)),
