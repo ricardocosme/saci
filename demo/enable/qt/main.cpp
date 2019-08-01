@@ -30,13 +30,15 @@ int main(int argc, char** argv) {
     layout.addWidget(&qtextedit);
     
     object<bool> model{false};
-
     model.for_each([](bool v)
     { std::cout << "checkbox is " << (v ? "true" : "false") << std::endl; });
     
     saci::qt::checkbox checkbox(model, qcheckbox);
 
     object<std::string> name{"Clear this text to disable the checkbox"};
+    name.for_each([](std::string s)
+    { std::cout << "name is '" << s << "'" << std::endl; });
+        
     saci::qt::textedit textedit(name, qtextedit);
     
     window.show();
