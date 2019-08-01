@@ -33,6 +33,18 @@ endmacro(add_qt_demo)
 add_qt_demo(checkbox)
 add_qt_demo(radio_btn)
 add_qt_demo(spinbox)
+add_qt_demo(textedit)
 
+add_executable(
+    qt_enable
+    demo/enable/qt/main.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/checkbox_view_to_model.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/textedit_view_to_model.cpp
+)
+
+target_link_libraries(qt_enable ${QT_LIBRARIES})
+list(APPEND MOCS ${CMAKE_CURRENT_BINARY_DIR}/checkbox_view_to_model.cpp
+${CMAKE_CURRENT_BINARY_DIR}/textedit_view_to_model.cpp)
+    
 add_library(saci_qt ${MOCS})
 target_include_directories(saci_qt PUBLIC include)

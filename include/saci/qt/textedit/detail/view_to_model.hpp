@@ -8,27 +8,32 @@
 
 #include <coruja/object/any_object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
-#include <QCheckBox>
 #include <QObject>
+#include <QTextEdit>
 
+#include <string>
 #include <utility>
 
 namespace saci { namespace qt {  namespace detail {
 
-class checkbox_to_model : public QObject {
+class textedit_to_model : public QObject {
     Q_OBJECT
 public:
-    checkbox_to_model() = default;
-    checkbox_to_model(coruja::any_object<bool> pmodel, QCheckBox&)
-        : model(std::move(pmodel)) {}
-    virtual ~checkbox_to_model() = default;
-    coruja::any_object<bool> model;
+    textedit_to_model() = default;
+    textedit_to_model(coruja::any_object<std::string> pmodel,
+                      QTextEdit& pwidget)
+        : model(std::move(pmodel))
+        , widget(pwidget)
+    {}
+    virtual ~textedit_to_model() = default;
+    coruja::any_object<std::string> model;
     coruja::any_connection conn;
+    QTextEdit& widget;
 public Q_SLOTS:
-    void propagates(int v)
+    void propagates()
     {
         auto blk = coruja::make_scoped_blocked_connection(conn);
-        model = v == Qt::Checked ? true : false;
+        model = widget.toPlainText().toStdString();
     }
 };
 

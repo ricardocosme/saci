@@ -9,6 +9,7 @@
 #include <coruja/object/any_object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QObject>
+#include <QDoubleSpinBox>
 
 namespace saci { namespace qt { namespace detail {
 
@@ -16,7 +17,7 @@ class spinbox_to_model : public QObject {
     Q_OBJECT
 public:
     spinbox_to_model() = default;
-    spinbox_to_model(coruja::any_object<double> pmodel)
+    spinbox_to_model(coruja::any_object<double> pmodel, QDoubleSpinBox&)
         : model(std::move(pmodel)) {}
     virtual ~spinbox_to_model() = default;
     coruja::any_object<double> model;

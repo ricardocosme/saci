@@ -9,6 +9,7 @@
 #include <coruja/object/any_object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QObject>
+#include <QRadioButton>
 
 namespace saci { namespace qt { namespace detail {
 
@@ -16,7 +17,7 @@ class radio_btn_to_model : public QObject {
     Q_OBJECT
 public:
     radio_btn_to_model() = default;
-    radio_btn_to_model(coruja::any_object<bool> pmodel)
+    radio_btn_to_model(coruja::any_object<bool> pmodel, QRadioButton&)
         : model(std::move(pmodel)) {}
     virtual ~radio_btn_to_model() = default;
     coruja::any_object<bool> model;

@@ -17,7 +17,7 @@ struct checkbox
     : base_widget<
           QCheckBox,
           bool,
-    detail::checkbox_to_model
+          detail::checkbox_to_model
     >
 {
     using base = base_widget<QCheckBox,
