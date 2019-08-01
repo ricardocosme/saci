@@ -40,6 +40,7 @@ project saci
   ;
   
 run test/move.cpp ;
+run test/root.cpp ;
 
 exe tree_qt
   : demo/tree/qt/main.cpp
