@@ -13,7 +13,7 @@ inline void sync_with_domain(Node& node, T& obj)
 {
     node.observe_for_each
         (obj, [](Node& self, typename T::value_type& o)
-        { self.children.emplace_back(self, o); });
+        { self.children.emplace_back(o, self); });
         
     node.observe_before_erase
         (obj, [](Node& self, typename T::value_type& o) {
@@ -29,7 +29,7 @@ inline void sync_with_domain(Node& node, Nodes& nodes, T& obj)
         (obj, [](Node& self, typename T::value_type& o)
         {
             auto& nodes = *boost::fusion::find<Nodes>(self.children);
-            nodes.emplace_back(self, o);
+            nodes.emplace_back(o, self);
         });
         
     node.observe_before_erase
@@ -49,7 +49,7 @@ struct sync_with_domain_t {
     template<typename T>
     void operator()(T& o) const {
         typename T::type tmp; //dummy
-        o = T(node, tmp);
+        o = T(tmp, node);
     }
     Node& node;
 };
@@ -62,7 +62,7 @@ struct assign_sync_with_domain_t {
     template<typename T>
     void operator()(T& o) const {
         typename T::type tmp; //dummy
-        o = T(node, tmp);
+        o = T(tmp, node);
     }
     Node& node;
 };

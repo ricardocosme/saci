@@ -12,7 +12,7 @@
 #include <coruja/observer_class.hpp>
 #include <coruja/support/type_traits.hpp>
 
-#include "saci/tree/model/branch_base.hpp"
+#include "saci/tree/model/node_base.hpp"
 #include "saci/tree/model/detail/apply_node_impl.hpp"
 #include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/init_children.hpp"
@@ -52,9 +52,9 @@ template<typename Parent,
          typename CheckPolicy,
          typename T,
          typename Children>
-struct branch_node : branch_base<Parent, CheckPolicy, Expandable, T>
+struct branch_node : node_base<T, CheckPolicy, Expandable, Parent>
 {
-    using base = branch_base<Parent, CheckPolicy, Expandable, T>;
+    using base = node_base<T, CheckPolicy, Expandable, Parent>;
 
     using children_t = typename boost::fusion::result_of::as_vector<
         typename boost::mpl::transform<
@@ -62,7 +62,7 @@ struct branch_node : branch_base<Parent, CheckPolicy, Expandable, T>
     >::type;
     
     branch_node() = default;
-    branch_node(Parent& p, T& o) : base(p, o)
+    branch_node(T& o, Parent& p) : base(o, p)
     {boost::fusion::for_each(children, detail::init_children<branch_node>{*this});}
     
     branch_node(branch_node&&) = delete;
@@ -92,12 +92,13 @@ template<typename Parent,
 struct collection_branch_node_impl
     : coruja::observer_class<
     collection_branch_node_impl<Parent,CheckPolicy, GetContainer, Child>,
-    branch_base<Parent, CheckPolicy, Expandable,
-                typename std::remove_reference<
+    node_base<typename std::remove_reference<
                     typename std::result_of<
                         GetContainer(typename Parent::type&)
                             >::type
-                    >::type>>
+                  >::type,
+              CheckPolicy, Expandable,
+              Parent>>
 {
     using T = typename std::remove_reference<
         typename std::result_of<
@@ -107,7 +108,7 @@ struct collection_branch_node_impl
 
     using base = coruja::observer_class<
         collection_branch_node_impl<Parent, CheckPolicy, GetContainer, Child>,
-        branch_base<Parent, CheckPolicy, Expandable, T>>;
+        node_base<T, CheckPolicy, Expandable, Parent>>;
 
     using check_t = CheckPolicy;
     using children_t = typename detail::node_impl<
@@ -117,7 +118,7 @@ struct collection_branch_node_impl
     using get_container = GetContainer;
     
     collection_branch_node_impl() = default;
-    collection_branch_node_impl(Parent& p, T& pobj) : base(p, pobj)
+    collection_branch_node_impl(T& pobj, Parent& p) : base(pobj, p)
     {
         sync_with_domain(*this, pobj);
     }
@@ -148,12 +149,12 @@ template<typename Parent,
 struct collection_branch_node_children_impl
     : coruja::observer_class<
     collection_branch_node_children_impl<Parent,CheckPolicy, GetContainer, Children>,
-    branch_base<Parent, CheckPolicy, Expandable,
-                typename std::remove_reference<
+    node_base<typename std::remove_reference<
                     typename std::result_of<
                         GetContainer(typename Parent::type&)
                             >::type
-                    >::type>>
+                  >::type,CheckPolicy, Expandable, Parent
+                >>
 {
     using T = typename std::remove_reference<
         typename std::result_of<
@@ -167,7 +168,7 @@ struct collection_branch_node_children_impl
     
     using base = coruja::observer_class<
         collection_branch_node_children_impl<Parent, CheckPolicy, GetContainer, Children>,
-        branch_base<Parent, CheckPolicy, Expandable, T>>;
+        node_base<T, CheckPolicy, Expandable, Parent>>;
 
     using check_t = CheckPolicy;
 
@@ -178,7 +179,7 @@ struct collection_branch_node_children_impl
     using get_container = GetContainer;
     
     collection_branch_node_children_impl() = default;
-    collection_branch_node_children_impl(Parent& p, T& pobj) : base(p, pobj)
+    collection_branch_node_children_impl(T& pobj, Parent& p) : base(pobj, p)
     {
         boost::fusion::for_each
             (children,

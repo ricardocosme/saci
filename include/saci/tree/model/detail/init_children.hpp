@@ -14,7 +14,7 @@ struct init_children<Self,
 {
     template<typename T>
     void operator()(T& o) const
-    { o = T(self, typename T::get_container{}(*self.obj, self.parent->ctx)); }
+        { o = T(typename T::get_container{}(*self.obj, self.parent->ctx), self); }
     Self& self;
 };
 
@@ -25,7 +25,7 @@ struct init_children<Self,
 {
     template<typename T>
     void operator()(T& o) const
-    { o = T(self, typename T::get_container{}(*self.obj)); }
+        { o = T(typename T::get_container{}(*self.obj), self); }
     Self& self;
 };
 

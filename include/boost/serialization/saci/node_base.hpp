@@ -1,6 +1,6 @@
 #pragma once
 
-#include <saci/tree/model/branch_base.hpp>
+#include <saci/tree/model/node_base.hpp>
 #include <boost/serialization/saci/check.hpp>
 
 #include <boost/fusion/include/size.hpp>
@@ -14,11 +14,11 @@ template<typename Archive,
          typename ExpandPolicy,
          typename T>
 inline void save(Archive& ar,
-                 const saci::tree::branch_base<
-                 Parent, CheckPolicy, ExpandPolicy, T>& o,
+                 const saci::tree::node_base<
+                 T, CheckPolicy, ExpandPolicy, Parent>& o,
                  unsigned int version)
 {
-    using branch_t = saci::tree::branch_base<
+    using branch_t = saci::tree::node_base<
         Parent, CheckPolicy, ExpandPolicy, T>;
     save_expand(ar, o, typename branch_t::expand_t{});
     save_check(ar, o, typename branch_t::check_t{});
@@ -30,11 +30,11 @@ template<typename Archive,
          typename ExpandPolicy,
          typename T>
 inline void load(Archive& ar,
-                 saci::tree::branch_base<
-                 Parent, CheckPolicy, ExpandPolicy, T>& o,
+                 saci::tree::node_base<
+                 T, CheckPolicy, ExpandPolicy, Parent>& o,
                  unsigned int version)
 {
-    using branch_t = saci::tree::branch_base<
+    using branch_t = saci::tree::node_base<
         Parent, CheckPolicy, ExpandPolicy, T>;
     load_expand(ar, o, typename branch_t::expand_t{});
     load_check(ar, o, typename branch_t::check_t{});
@@ -46,8 +46,8 @@ template<typename Archive,
          typename ExpandPolicy,
          typename T>
 inline void serialize(Archive& ar,
-                 saci::tree::branch_base<
-                 Parent, CheckPolicy, ExpandPolicy, T>& o,
+                 saci::tree::node_base<
+                 T, CheckPolicy, ExpandPolicy, Parent>& o,
                  unsigned int version)
 { split_free(ar, o, version); }
 

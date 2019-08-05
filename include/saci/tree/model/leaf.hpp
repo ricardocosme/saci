@@ -1,13 +1,8 @@
 #pragma once
 
-#include <coruja/object/any_object_view.hpp>
-#include <coruja/object/lift.hpp>
-#include <coruja/object/object.hpp>
-
-#include "saci/tree/model/detail/tag.hpp"
 #include "saci/tree/model/detail/expand.hpp"
-#include "saci/tree/model/detail/visibility.hpp"
-#include "saci/tree/model/detail/node_impl_fwd.hpp"
+#include "saci/tree/model/detail/tag.hpp"
+#include "saci/tree/model/node_base.hpp"
 
 #include <type_traits>
 
@@ -28,7 +23,7 @@ struct leaves : detail::tag_leaves {
 template<typename Parent,
          typename CheckPolicy,
          typename T>
-using leaf_node = branch_base<Parent, CheckPolicy, UnExpandable, T>;
+using leaf_node = node_base<T, CheckPolicy, UnExpandable, Parent>;
 
 }}
 
