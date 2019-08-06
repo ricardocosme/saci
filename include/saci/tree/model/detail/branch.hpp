@@ -4,6 +4,7 @@
 #include <boost/hof/is_invocable.hpp>
 
 #include "saci/tree/model/detail/node_impl_fwd.hpp"
+#include "saci/tree/model/detail/T_is_function_obj.hpp"
 
 namespace saci { namespace tree {
 
@@ -13,8 +14,8 @@ struct get_branch_node;
 template<typename Parent, typename T>
 struct get_branch_node<
     Parent, T,
-    typename std::enable_if<!boost::hof::is_invocable<typename T::type, typename Parent::type&>
-                            ::value>::type>
+    detail::enable_if_T_is_not_function_obj<typename T::type, Parent>
+>
 {
     using type = branch_node<Parent,
                              typename T::check_t,
@@ -25,9 +26,7 @@ struct get_branch_node<
 template<typename Parent, typename T>
 struct get_branch_node<
     Parent, T,
-    typename std::enable_if<
-        boost::hof::is_invocable<typename T::type, typename Parent::type&>::value
-    >::type
+    detail::enable_if_T_is_function_obj<typename T::type, Parent>
 >
 {
     using type = collection_branch_node<
