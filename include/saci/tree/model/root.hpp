@@ -22,27 +22,28 @@ struct with_ctx : detail::with_ctx_base {
     using ctx_t = Context;
 };
 
-template<typename T,
+template<typename ObservableErasableRange,
          typename CheckPolicy,
          typename Children,
          typename Enable = void>
 struct root;
 
-template<typename T,
+template<typename ObservableErasableRange,
          typename CheckPolicy,
          typename Children>
-struct root<T,
+struct root<ObservableErasableRange,
             CheckPolicy,
             Children,
-            detail::enable_if_ctx<T>
+            detail::enable_if_ctx<ObservableErasableRange>
 > : coruja::observer_class<
-        root<T, CheckPolicy, Children>,
-        detail::visibility<root<T, CheckPolicy, Children>, CheckPolicy>>
+        root<ObservableErasableRange, CheckPolicy, Children>,
+        detail::visibility<
+            root<ObservableErasableRange, CheckPolicy, Children>, CheckPolicy>>
 {
     using base = coruja::observer_class<
         root, detail::visibility<root, CheckPolicy>>;
-    using type = typename T::type;
-    using ctx_t = typename T::ctx_t;
+    using type = typename ObservableErasableRange::type;
+    using ctx_t = typename ObservableErasableRange::ctx_t;
     using check_t = CheckPolicy;
     using expand_t = Expandable;
     using children_t = typename detail::node_impl<root, Children>::type;
@@ -82,20 +83,21 @@ struct root<T,
 //TODO Contemplar mais de um filho. root reflete um
 //collection_branch_node sem pai. Avaliar a versão de root que é
 //análoga a branch_node sem pai.(Considerar root como tag e usar node_impl)
-template<typename T,
+template<typename ObservableErasableRange,
          typename CheckPolicy,
          typename Children>
-struct root<T,
+struct root<ObservableErasableRange,
             CheckPolicy,
             Children,
-            detail::enable_if_not_ctx<T>
+            detail::enable_if_not_ctx<ObservableErasableRange>
 > : coruja::observer_class<
-        root<T, CheckPolicy, Children>,
-        detail::visibility<root<T, CheckPolicy, Children>, CheckPolicy>>
+        root<ObservableErasableRange, CheckPolicy, Children>,
+        detail::visibility<
+            root<ObservableErasableRange, CheckPolicy, Children>, CheckPolicy>>
 {
     using base = coruja::observer_class<
         root, detail::visibility<root, CheckPolicy>>;
-    using type = T;
+    using type = ObservableErasableRange;
     using ctx_t = void;
     using check_t = CheckPolicy;
     using expand_t = Expandable;
