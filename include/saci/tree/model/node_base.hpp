@@ -6,45 +6,74 @@
 
 #pragma once
 
-#include "saci/tree/model/detail/expand.hpp"
-#include "saci/tree/model/detail/visibility.hpp"
+#include "saci/tree/model/detail/T_is_function_obj.hpp"
+#include "saci/tree/model/detail/result_of_get_object.hpp"
+#include "saci/tree/model/node_base_common.hpp"
+
+#include <type_traits>
 
 namespace saci { namespace tree {
 
-template<typename T,
+template<typename Object,
+         typename CheckPolicy,
+         typename ExpandPolicy,
+         typename Parent,
+         typename EnableIfTIsFunctionObj = void>
+struct node_base;
+
+template<typename GetObject,
          typename CheckPolicy,
          typename ExpandPolicy,
          typename Parent>
-struct node_base
-    : detail::visibility<node_base<T, CheckPolicy, ExpandPolicy, Parent>,
-                         CheckPolicy,
-                         Parent>
-    , detail::expand<ExpandPolicy>
+struct node_base<
+    GetObject,
+    CheckPolicy,
+    ExpandPolicy,
+    Parent,
+    detail::enable_if_T_is_function_obj<GetObject, Parent>
+>
+    : node_base_common<
+          detail::result_of_get_object<GetObject, Parent>,
+          CheckPolicy,
+          ExpandPolicy,
+          Parent>
 {
-    using visibility_base = detail::visibility<node_base, CheckPolicy, Parent>;
-    using expand_base = detail::expand<ExpandPolicy>;
+    using type = detail::result_of_get_object<GetObject, Parent>;
+    using base = node_base_common<
+        type,
+        CheckPolicy,
+        ExpandPolicy,
+        Parent>;
+    using base::base;
+    
+    using get_object = GetObject;
+};
 
-    using type = T;
-    using check_t = CheckPolicy;
-    using expand_t = ExpandPolicy;
-    using parent_t = Parent;
+template<typename Object,
+         typename CheckPolicy,
+         typename ExpandPolicy,
+         typename Parent>
+struct node_base<
+    Object,
+    CheckPolicy,
+    ExpandPolicy,
+    Parent,
+    detail::enable_if_T_is_not_function_obj<Object, Parent>
+>
+    : node_base_common<
+          Object,
+          CheckPolicy,
+          ExpandPolicy,
+          Parent>
+{
+    using base = node_base_common<
+        Object,
+        CheckPolicy,
+        ExpandPolicy,
+        Parent>;
+    using base::base;
     
-    node_base() = default;
-    
-    node_base(type& pobj, parent_t& p)
-        : visibility_base(p)
-        , expand_base()
-        , parent(&p)
-        , obj(&pobj)
-    {}
-
-    void update_parent_ptr(Parent& p) {
-        parent = &p;
-        static_cast<visibility_base&>(*this).update_parent_ptr(p);
-    }
-    
-    parent_t* parent{nullptr};
-    type* obj{nullptr};
+    using type = Object;
 };
 
 }}

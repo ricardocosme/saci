@@ -39,6 +39,7 @@ project saci
     <use>/boost//headers
   ;
   
+run test/branch.cpp ;
 run test/move.cpp ;
 run test/root.cpp ;
 

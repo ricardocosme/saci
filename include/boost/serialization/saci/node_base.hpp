@@ -19,7 +19,7 @@ inline void save(Archive& ar,
                  unsigned int version)
 {
     using branch_t = saci::tree::node_base<
-        Parent, CheckPolicy, ExpandPolicy, T>;
+        T, CheckPolicy, ExpandPolicy, Parent>;
     save_expand(ar, o, typename branch_t::expand_t{});
     save_check(ar, o, typename branch_t::check_t{});
 }
@@ -35,7 +35,7 @@ inline void load(Archive& ar,
                  unsigned int version)
 {
     using branch_t = saci::tree::node_base<
-        Parent, CheckPolicy, ExpandPolicy, T>;
+        T, CheckPolicy, ExpandPolicy, Parent>;
     load_expand(ar, o, typename branch_t::expand_t{});
     load_check(ar, o, typename branch_t::check_t{});
 }

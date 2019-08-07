@@ -6,7 +6,7 @@
 #include "saci/tree/model/detail/tag.hpp"
 #include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/visibility.hpp"
-#include "saci/tree/model/detail/with_ctx_base.hpp"
+#include "saci/tree/model/with_ctx.hpp"
 
 #include <coruja/container/list.hpp>
 #include <coruja/object/object.hpp>
@@ -15,12 +15,6 @@
 #include <type_traits>
 
 namespace saci { namespace tree {
-
-template<typename T, typename Context>
-struct with_ctx : detail::with_ctx_base {
-    using type = T;
-    using ctx_t = Context;
-};
 
 template<typename ObservableErasableRange,
          typename CheckPolicy,

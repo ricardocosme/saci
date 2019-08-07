@@ -115,7 +115,7 @@ struct collection_branch_node_impl
         collection_branch_node_impl, Child>::type;
     using child = typename children_t::value_type;
 
-    using get_container = GetContainer;
+    using get_object = GetContainer;
     
     collection_branch_node_impl() = default;
     collection_branch_node_impl(T& pobj, Parent& p) : base(pobj, p)
@@ -176,7 +176,7 @@ struct collection_branch_node_children_impl
         typename boost::mpl::transform<
             Children, detail::apply_node_impl<collection_branch_node_children_impl>>::type
     >::type;
-    using get_container = GetContainer;
+    using get_object = GetContainer;
     
     collection_branch_node_children_impl() = default;
     collection_branch_node_children_impl(T& pobj, Parent& p) : base(pobj, p)
