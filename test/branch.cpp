@@ -23,14 +23,23 @@ struct Name {
     { return o.name; }
 };
 
+struct Skills {
+    coruja::list<std::string>& operator()(person_t& o)
+    { return o.skills; }
+};
+
 template<typename Node>
 std::string& name(Node& o)
 { return *boost::fusion::at_c<0>(o.children).obj; }
 
+template<typename Node>
+coruja::list<std::string>& skills(Node& o)
+{ return *boost::fusion::at_c<1>(o.children).obj; }
+
 persons_t build_persons() {
     persons_t persons;
-    persons.emplace_back(person_t{"joao"});
-    persons.emplace_back(person_t{"maria"});
+    persons.emplace_back(person_t{"joao", {"woodworking", "cooking"}});
+    persons.emplace_back(person_t{"maria", {"cooking"}});
     persons.emplace_back(person_t{"alberto"});
     return persons;
 }
@@ -38,18 +47,59 @@ persons_t build_persons() {
 int main() {
     using namespace saci::tree;
 
-    auto persons = build_persons();
+    {
+        auto persons = build_persons();
     
-    //Branches with one child
-    using tree_t =
-        root<persons_t, UnCheckable,
-            branches<person_t, Checkable,
-                leaf<Name, UnCheckable>
-            >
-        >;
-    tree_t t(persons);
+        using tree_t =
+            root<persons_t, UnCheckable,
+                 branches<persons_t, Checkable,
+                          leaf<Name, UnCheckable>,
+                          leaf<Skills, UnCheckable>
+                          >
+                 >;
+        tree_t t(persons);
     
-    BOOST_TEST(name(t.children.front()) == "joao");
-    BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
-    BOOST_TEST(name(t.children.back()) == "alberto");
+        BOOST_TEST(name(t.children.front()) == "joao");
+        BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
+        BOOST_TEST(name(t.children.back()) == "alberto");
+
+        BOOST_TEST(skills(t.children.front()).size() == 2);
+        BOOST_TEST(skills(t.children.back()).empty());
+    }
+
+    {
+        auto persons = build_persons();
+    
+        using tree_t =
+            root<persons_t, UnCheckable,
+                 branches<persons_t, Checkable,
+                          leaf<Name, UnCheckable>
+                          // leaves<Skills, UnCheckable>
+                          >
+                 >;
+        tree_t t(persons);
+    
+        BOOST_TEST(name(t.children.front()) == "joao");
+        BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
+        BOOST_TEST(name(t.children.back()) == "alberto");
+
+        // BOOST_TEST(skills(t.children.front()).size() == 2);
+        // BOOST_TEST(skills(t.children.back()).empty());
+    }
+    
+    {
+        // auto persons = build_persons();
+    
+        // using tree_t =
+        //     root<persons_t, UnCheckable,
+        //          branches<person_t, Checkable,
+        //                   leaf<person_t, UnCheckable>
+        //                   >
+        //          >;
+        // tree_t t(persons);
+    
+        // BOOST_TEST(name(t.children.front()) == "joao");
+        // BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
+        // BOOST_TEST(name(t.children.back()) == "alberto");
+    }
 }

@@ -14,15 +14,15 @@ struct leaf : detail::tag_leaf {
     using check_t = CheckPolicy;
 };
 
-template<typename T, typename CheckPolicy>
+template<typename ObservableErasableRange, typename CheckPolicy>
 struct leaves : detail::tag_leaves {
-    using type = T;
+    using type = typename ObservableErasableRange::value_type;
     using check_t = CheckPolicy;
 };
 
-template<typename Parent,
+template<typename T,
          typename CheckPolicy,
-         typename T>
+         typename Parent>
 using leaf_node = node_base<T, CheckPolicy, UnExpandable, Parent>;
 
 }}

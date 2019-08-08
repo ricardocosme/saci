@@ -17,7 +17,7 @@ using name = std::string;
 using onames = coruja::list<name>;
 
 template<typename CheckPolicy>
-using tree_t = root<onames, CheckPolicy, leaves<name, UnCheckable>>;
+using tree_t = root<onames, CheckPolicy, leaves<onames, UnCheckable>>;
 
 template<typename Root>
 void equals_to(Root& r, std::initializer_list<name> expected) {
@@ -78,8 +78,8 @@ int main() {
     //Checkable - visible
     {
         onames c{"abc", "def", "ghi"};
-        using tree = root<onames, Checkable, leaves<name, Checkable>>;
-        // root<onames, Checkable, leaves<name, Checkable>> t(c);
+        using tree = root<onames, Checkable, leaves<onames, Checkable>>;
+        // root<onames, Checkable, leaves<onames, Checkable>> t(c);
         tree t(c);
 
         BOOST_TEST(t.check == false);

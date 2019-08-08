@@ -35,7 +35,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, UnCheckable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list);
@@ -59,7 +59,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, UnCheckable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t rhs(l1list);    
         auto lhs = std::move(rhs);
@@ -83,7 +83,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, Checkable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list);
@@ -108,7 +108,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, Checkable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t rhs(l1list);    
         auto lhs = std::move(rhs);
@@ -133,7 +133,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, Checkable,
-                 leaves<L1, Checkable>
+                 leaves<l1list_t, Checkable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list);
@@ -152,7 +152,7 @@ int main() {
         
         using tree_t =
             root<l1list_t, Checkable,
-                 leaves<L1, Checkable>
+                 leaves<l1list_t, Checkable>
                  >;
         tree_t rhs(l1list);    
         auto lhs = std::move(rhs);
@@ -174,7 +174,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, UnCheckable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list, i);
@@ -199,7 +199,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, UnCheckable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t rhs(l1list, i);    
         auto lhs = std::move(rhs);
@@ -224,7 +224,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, Checkable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list, i);
@@ -250,7 +250,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, Checkable,
-                 leaves<L1, UnCheckable>
+                 leaves<l1list_t, UnCheckable>
                  >;
         tree_t rhs(l1list, i); 
         auto lhs = std::move(rhs);
@@ -276,7 +276,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, Checkable,
-                 leaves<L1, Checkable>
+                 leaves<l1list_t, Checkable>
                  >;
         tree_t lhs;
         lhs = tree_t(l1list, i);
@@ -296,7 +296,7 @@ int main() {
         
         using tree_t =
             root<with_ctx<l1list_t, int>, Checkable,
-                 leaves<L1, Checkable>
+                 leaves<l1list_t, Checkable>
                  >;
         tree_t rhs(l1list, i);    
         auto lhs = std::move(rhs);

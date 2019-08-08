@@ -33,9 +33,9 @@ struct branch : detail::tag_branch {
     using children = boost::mpl::vector<Children...>;
 };
 
-template<typename T, typename CheckPolicy, typename...Children>
+template<typename ObservableErasableRange, typename CheckPolicy, typename...Children>
 struct branches : detail::tag_branches {
-    using type = T;
+    using type = typename ObservableErasableRange::value_type;
     using check_t = CheckPolicy;
     using children = boost::mpl::vector<Children...>;
 };
