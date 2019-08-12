@@ -16,6 +16,25 @@ set(QT_QMAKE_EXECUTABLE ${QT_ROOT_DIR}/bin/qmake)
 find_package(Qt4 4.8.0 REQUIRED)
 include(${QT_USE_FILE})
 
+qt4_generate_moc(
+    include/saci/qt/push_btn/detail/clicked.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/push_btn_clicked.cpp
+)
+add_executable(
+    qt_push_btn
+    demo/push_btn/qt/main.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/push_btn_clicked.cpp
+)
+list(APPEND MOCS ${CMAKE_CURRENT_BINARY_DIR}/push_btn_clicked.cpp)
+target_link_libraries(qt_push_btn ${QT_LIBRARIES})
+
+add_executable(
+  qt_tree
+  demo/tree/qt/main.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/push_btn_clicked.cpp
+)
+target_link_libraries(qt_tree ${QT_LIBRARIES})
+
 macro(add_qt_demo NAME)
     qt4_generate_moc(
         include/saci/qt/${NAME}/detail/view_to_model.hpp

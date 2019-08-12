@@ -1,9 +1,10 @@
 #include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
-#include <QtGui/QTreeWidget>
+#include <QtGui/QDialog>
+#include <QtGui/QVBoxLayout>
 #include <coruja/container/list.hpp>
 #include <coruja/object/object.hpp>
 #include <saci/tree/model/tree.hpp>
+#include <saci/qt/push_btn/push_btn.hpp>
 
 #include <iostream>
 #include <string>
@@ -30,19 +31,24 @@ coruja::object<std::string>& node_label(person_t& o)
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-
-    QMainWindow window;
-    window.setMinimumSize(400, 400);
+    QDialog window;
+    QVBoxLayout layout(&window);
     
     persons_t persons;
     model_tree_t model(persons);
     
-    persons.emplace_back("joao");
-    persons.emplace_back("diego");
-    
     QTreeWidget treeWidget(&window);
-    st::view::qt::tree tree(model, treeWidget);
-    tree.widget().adjustSize();
+    treeWidget.setSelectionMode(QAbstractItemView::MultiSelection);
+    QPushButton qpushbtn(&window);
+
+    layout.addWidget(&treeWidget);
+    layout.addWidget(&qpushbtn);
+    
+    persons.emplace_back("joao");
+    persons.emplace_back("josefina");
+    persons.emplace_back("diego");
+   
+    st::view::qt::tree<model_tree_t> tree(model, treeWidget);
     
     persons.emplace_back("maria");
     persons.erase(std::prev(persons.end()));
@@ -53,6 +59,9 @@ int main(int argc, char** argv) {
     
     model.children.front().check.after_change([](bool v)
     {std::cout << "front element visibility=" << v << std::endl;});
+
+    saci::qt::experimental::push_btn remove("remove selected nodes", qpushbtn);
+    remove.clicked([&]{ tree.remove_selected_nodes(); });
     
     window.show();
     return app.exec();
