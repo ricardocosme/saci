@@ -23,7 +23,7 @@ inline void sync_with_domain(Node& node, T& obj)
 }
 
 template<typename Node, typename Nodes, typename T>
-inline void sync_with_domain(Node& node, Nodes& nodes, T& obj)
+inline void sync_with_domain(Node& node, Nodes&, T& obj)
 {
     node.observe_for_each
         (obj, [](Node& self, typename T::value_type& o)
@@ -46,6 +46,11 @@ struct sync_with_domain_t {
     void operator()(coruja::list<T>& o) const {
         sync_with_domain(node, o, *node.obj);
     }
+    
+    template<typename T, typename CheckPolicy, typename P>
+    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
+        sync_with_domain(node, o, *node.obj);
+    }
     template<typename T>
     void operator()(T& o) const {
         typename T::type tmp; //dummy
@@ -56,6 +61,10 @@ struct sync_with_domain_t {
 
 template<typename Node>
 struct assign_sync_with_domain_t {
+    template<typename T, typename CheckPolicy, typename P>
+    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
+    }
+    
     template<typename T>
     void operator()(coruja::list<T>& o) const {
     }

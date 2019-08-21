@@ -14,9 +14,9 @@ struct leaf : detail::tag_leaf {
     using check_t = CheckPolicy;
 };
 
-template<typename ObservableErasableRange, typename CheckPolicy>
+template<typename T, typename CheckPolicy>
 struct leaves : detail::tag_leaves {
-    using type = typename ObservableErasableRange::value_type;
+    using type = T;
     using check_t = CheckPolicy;
 };
 

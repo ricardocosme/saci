@@ -52,9 +52,13 @@ template<typename Parent,
          typename CheckPolicy,
          typename T,
          typename Children>
-struct branch_node : node_base<T, CheckPolicy, Expandable, Parent>
+struct branch_node
+
+    : coruja::observer_class<
+    branch_node<Parent, CheckPolicy, T, Children>,
+    node_base<T, CheckPolicy, Expandable, Parent>>
 {
-    using base = node_base<T, CheckPolicy, Expandable, Parent>;
+    using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
 
     using children_t = typename boost::fusion::result_of::as_vector<
         typename boost::mpl::transform<

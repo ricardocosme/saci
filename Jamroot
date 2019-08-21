@@ -39,42 +39,43 @@ project saci
     <use>/boost//headers
   ;
   
+run test/leaf.cpp ;
 run test/branch.cpp ;
 run test/move.cpp ;
 run test/root.cpp ;
 
-exe tree_qt
-  : demo/tree/qt/main.cpp
-  : <library>/Qt//QtCore
-    <library>/Qt//QtGui
-  ;
-explicit tree_qt ;
+# exe tree_qt
+#   : demo/tree/qt/main.cpp
+#   : <library>/Qt//QtCore
+#     <library>/Qt//QtGui
+#   ;
+# explicit tree_qt ;
 
-exe radio_btn_qt
-  : demo/radio_btn/qt/main.cpp
-  : <library>/Qt//QtCore
-    <library>/Qt//QtGui
-  ;
-explicit radio_btn_qt ;
+# exe radio_btn_qt
+#   : demo/radio_btn/qt/main.cpp
+#   : <library>/Qt//QtCore
+#     <library>/Qt//QtGui
+#   ;
+# explicit radio_btn_qt ;
 
-exe checkbox_qt
-  : demo/checkbox/qt/main.cpp
-  : <library>/Qt//QtCore
-    <library>/Qt//QtGui
-  ;
-explicit checkbox_qt ;
+# exe checkbox_qt
+#   : demo/checkbox/qt/main.cpp
+#   : <library>/Qt//QtCore
+#     <library>/Qt//QtGui
+#   ;
+# explicit checkbox_qt ;
 
-exe spinbox_qt
-  : demo/spinbox/qt/main.cpp
-  : <library>/Qt//QtCore
-    <library>/Qt//QtGui
-  ;
-explicit spinbox_qt ;
+# exe spinbox_qt
+#   : demo/spinbox/qt/main.cpp
+#   : <library>/Qt//QtCore
+#     <library>/Qt//QtGui
+#   ;
+# explicit spinbox_qt ;
 
-install stage
-  : tree_qt
-    radio_btn_qt
-    checkbox_qt
-    spinbox_qt
-  ;
+# install stage
+#   : tree_qt
+#     radio_btn_qt
+#     checkbox_qt
+#     spinbox_qt
+#   ;
   

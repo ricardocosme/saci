@@ -19,7 +19,7 @@ using persons_t = coruja::list<person_t>;
     
 using model_tree_t =
 st::root<persons_t, st::UnCheckable, 
-  st::leaves<persons_t::value_type, st::Checkable> 
+  st::leaves<persons_t, st::Checkable> 
 >;
 
 namespace saci { namespace tree {

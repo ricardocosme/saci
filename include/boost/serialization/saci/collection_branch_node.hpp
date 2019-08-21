@@ -1,6 +1,7 @@
 #pragma once
 
 #include <saci/tree/model/branch.hpp>
+#include <saci/tree/model/leaves_impl.hpp>
 #include <boost/serialization/saci/check.hpp>
 
 #include <boost/serialization/coruja_object.hpp>
@@ -82,6 +83,16 @@ struct _save_child_branch_node {
         }
     }
 
+    template<typename T, typename CheckPolicy, typename Parent>
+    void operator()(const saci::tree::leaves_impl<T, CheckPolicy, Parent>& o) const
+    {
+        ar << o.size();
+        for(auto& e : o) {
+            ar << node_obj_id(*e.obj);
+            ar << e;
+        }
+    }
+    
     template<typename T>
     void operator()(T& o) const
     {
@@ -107,6 +118,26 @@ struct _load_child_branch_node {
                 ar >> *it;
             else {
                 T skipped;
+                ar >> skipped;
+            }
+        }
+    }
+    
+    template<typename T, typename CheckPolicy, typename Parent>
+    void operator()(saci::tree::leaves_impl<T, CheckPolicy, Parent>& o) const
+    {
+        std::size_t n;
+        ar >> n;
+        for(std::size_t i(0); i < n; ++i) {
+            std::string id;
+            ar >> id;
+            auto it = std::find_if
+                (o.begin(), o.end(),
+                 [&id](typename saci::tree::leaves_impl<T, CheckPolicy, Parent>::value_type& child){ return id == node_obj_id(*child.obj); });
+            if(it != o.end())
+                ar >> *it;
+            else {
+                typename saci::tree::leaves_impl<T, CheckPolicy, Parent>::value_type skipped;
                 ar >> skipped;
             }
         }
