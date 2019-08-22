@@ -22,19 +22,29 @@ inline void sync_with_domain(Node& node, T& obj)
         });
 }
 
+template<typename Nodes, typename T>
+coruja::list<T>& get_nodes(coruja::list<T>& children)
+{ return children; }
+
+template<typename Nodes, typename... T>
+Nodes& get_nodes(boost::fusion::vector<T...>& children)
+{ return *boost::fusion::find<Nodes>(children); }
+
 template<typename Node, typename Nodes, typename T>
 inline void sync_with_domain(Node& node, Nodes&, T& obj)
 {
     node.observe_for_each
         (obj, [](Node& self, typename T::value_type& o)
         {
-            auto& nodes = *boost::fusion::find<Nodes>(self.children);
+            // auto& nodes = *boost::fusion::find<Nodes>(self.children);
+            auto& nodes = get_nodes<Nodes>(self.children);
             nodes.emplace_back(o, self);
         });
         
     node.observe_before_erase
         (obj, [](Node& self, typename T::value_type& o) {
-            auto& nodes = *boost::fusion::find<Nodes>(self.children);
+            // auto& nodes = *boost::fusion::find<Nodes>(self.children);
+            auto& nodes = get_nodes<Nodes>(self.children);
             nodes.remove_if([&o](typename Nodes::value_type& node)
             { return &o == node.obj; });
         });

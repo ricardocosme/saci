@@ -91,7 +91,7 @@ int main() {
         // BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
         // BOOST_TEST(name(t.children.back()) == "alberto");
 
-        BOOST_TEST(boost::fusion::at_c<0>(t.children.front().children).size() == 2);
+        BOOST_TEST(t.children.front().children.size() == 2);
         // BOOST_TEST(skills(t.children.back()).empty());
     }
     

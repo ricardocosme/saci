@@ -51,10 +51,21 @@ struct child_of : child_of_base {
 template<typename T,
          typename CheckPolicy,
          typename Children,
-         typename Parent>
-struct branch_node
+         typename Parent,
+         typename EnableIfChildren = void>
+struct branch_node;
 
-    : coruja::observer_class<
+template<typename T,
+         typename CheckPolicy,
+         typename Children,
+         typename Parent>
+struct branch_node<
+    T,
+    CheckPolicy,
+    Children,
+    Parent,
+    typename std::enable_if<boost::mpl::size<Children>::value >= 2>::type
+> : coruja::observer_class<
     branch_node<T, CheckPolicy, Children, Parent>,
     node_base<T, CheckPolicy, Expandable, Parent>>
 {
@@ -83,6 +94,50 @@ struct branch_node
         base::update_parent_ptr(p);
         boost::fusion::for_each
             (children, detail::update_parent_ptr<branch_node>{*this});
+    }
+    
+    children_t children;
+};
+
+template<typename T,
+         typename CheckPolicy,
+         typename Children,
+         typename Parent>
+struct branch_node<
+    T,
+    CheckPolicy,
+    Children,
+    Parent,
+    typename std::enable_if<boost::mpl::size<Children>::value == 1>::type
+> : coruja::observer_class<
+    branch_node<T, CheckPolicy, Children, Parent>,
+    node_base<T, CheckPolicy, Expandable, Parent>>
+{
+    using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
+
+    using children_t = typename detail::node_impl<
+        branch_node, typename boost::mpl::front<Children>::type
+    >::type;
+    // using child = typename children_t::value_type;
+    
+    branch_node() = default;
+    branch_node(T& o, Parent& p) : base(o, p)
+    {
+        detail::init_children<branch_node>{*this}(children);
+    }
+    
+    branch_node(branch_node&&) = delete;
+    
+    branch_node& operator=(branch_node&& rhs) {
+        base::operator=(std::move(rhs));
+        children = std::move(rhs.children);
+        // detail::update_parent_ptr<branch_node>{*this}(children);
+        return *this;
+    }
+    
+    void update_parent_ptr(Parent& p) {
+        base::update_parent_ptr(p);
+        // detail::update_parent_ptr<branch_node>{*this}(children);
     }
     
     children_t children;
