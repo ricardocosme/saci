@@ -48,14 +48,14 @@ struct child_of : child_of_base {
     using child = Child;
 };
 
-template<typename Parent,
+template<typename T,
          typename CheckPolicy,
-         typename T,
-         typename Children>
+         typename Children,
+         typename Parent>
 struct branch_node
 
     : coruja::observer_class<
-    branch_node<Parent, CheckPolicy, T, Children>,
+    branch_node<T, CheckPolicy, Children, Parent>,
     node_base<T, CheckPolicy, Expandable, Parent>>
 {
     using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;

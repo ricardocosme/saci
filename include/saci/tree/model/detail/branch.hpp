@@ -17,10 +17,10 @@ struct get_branch_node<
     detail::enable_if_T_is_not_function_obj<typename T::type, Parent>
 >
 {
-    using type = branch_node<Parent,
+    using type = branch_node<typename T::type,
                              typename T::check_t,
-                             typename T::type,
-                             typename T::children>;
+                             typename T::children,
+                             Parent>;
 };
 
 template<typename Parent, typename T>

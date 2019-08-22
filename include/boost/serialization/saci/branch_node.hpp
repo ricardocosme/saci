@@ -25,17 +25,17 @@ struct load_child_branch_node {
 };
 
 template<typename Archive,
-         typename Parent,
-         typename CheckPolicy,
          typename T,
-         typename Children>
+         typename CheckPolicy,
+         typename Children,
+         typename Parent>
 inline void save(Archive& ar,
                  const saci::tree::branch_node<
-                 Parent, CheckPolicy, T, Children>& o,
+                 T, CheckPolicy, Children, Parent>& o,
                  unsigned int version)
 {
     using branch_t = saci::tree::branch_node<
-        Parent, CheckPolicy, T, Children>;
+        T, CheckPolicy, Children, Parent>;
     ar << o.expand;
     save_check(ar, o, typename branch_t::check_t{});
     ar << static_cast<std::size_t>(boost::fusion::size(o.children));
@@ -43,17 +43,17 @@ inline void save(Archive& ar,
 }
 
 template<typename Archive,
-         typename Parent,
-         typename CheckPolicy,
          typename T,
-         typename Children>
+         typename CheckPolicy,
+         typename Children,
+         typename Parent>
 inline void load(Archive& ar,
                  saci::tree::branch_node<
-                 Parent, CheckPolicy, T, Children>& o,
+                 T, CheckPolicy, Children, Parent>& o,
                  unsigned int version)
 {
     using branch_t = saci::tree::branch_node<
-        Parent, CheckPolicy, T, Children>;
+        T, CheckPolicy, Children, Parent>;
     ar >> o.expand;
     load_check(ar, o, typename branch_t::check_t{});
     std::size_t n;
@@ -62,13 +62,13 @@ inline void load(Archive& ar,
 }
 
 template<typename Archive,
-         typename Parent,
-         typename CheckPolicy,
          typename T,
-         typename Children>
+         typename CheckPolicy,
+         typename Children,
+         typename Parent>
 inline void serialize(Archive& ar,
                       saci::tree::branch_node<
-                      Parent, CheckPolicy, T, Children>& o,
+                      T, CheckPolicy, Children, Parent>& o,
                       unsigned int version)
 { split_free(ar, o, version); }
 
