@@ -118,7 +118,6 @@ struct branch_node<
     using children_t = typename detail::node_impl<
         branch_node, typename boost::mpl::front<Children>::type
     >::type;
-    // using child = typename children_t::value_type;
     
     branch_node() = default;
     branch_node(T& o, Parent& p) : base(o, p)
@@ -131,13 +130,13 @@ struct branch_node<
     branch_node& operator=(branch_node&& rhs) {
         base::operator=(std::move(rhs));
         children = std::move(rhs.children);
-        // detail::update_parent_ptr<branch_node>{*this}(children);
+        detail::update_parent_ptr<branch_node>{*this}(children);
         return *this;
     }
     
     void update_parent_ptr(Parent& p) {
         base::update_parent_ptr(p);
-        // detail::update_parent_ptr<branch_node>{*this}(children);
+        detail::update_parent_ptr<branch_node>{*this}(children);
     }
     
     children_t children;
