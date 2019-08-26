@@ -50,36 +50,97 @@ inline void sync_with_domain(Node& node, Nodes&, T& obj)
         });
 }
 
-template<typename Node>
-struct sync_with_domain_t {
+template<typename Node, typename Self>
+auto get_collection_ctx(Self& self, std::true_type)
+CORUJA_DECLTYPE_AUTO_RETURN(
+    typename Node::get_collection{}(*self.obj, self.parent->ctx)
+)
+
+template<typename Node, typename Self>
+auto get_collection_ctx(Self& self, std::false_type)
+CORUJA_DECLTYPE_AUTO_RETURN(
+    *self.obj
+    )
+
+template<typename Self, typename Enable = void>
+struct sync_with_domain_t;
+
+template<typename Self>
+struct sync_with_domain_t<
+    Self,
+    typename std::enable_if<
+        !std::is_same<typename Self::parent_t::ctx_t, void>::value>::type>
+{
     template<typename T>
     void operator()(coruja::list<T>& o) const {
-        sync_with_domain(node, o, *node.obj);
+        sync_with_domain(self, o, typename T::get_object{}(*self.obj, self.parent->ctx));
     }
     
     template<typename T, typename CheckPolicy, typename P>
     void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
-        sync_with_domain(node, o, *node.obj);
+        sync_with_domain(
+            self, o,
+            get_collection_ctx<leaves_impl<T, CheckPolicy, P>>(
+                self,
+                typename leaves_impl<T, CheckPolicy, P>::has_get_collection{}));
     }
     template<typename T>
     void operator()(T& o) const {
-        typename T::type tmp; //dummy
-        o = T(tmp, node);
+        auto&& lvalue = typename T::get_object{}(*self.obj, self.parent->ctx);
+        o = T(lvalue, self);
     }
-    Node& node;
+    Self& self;
+};
+
+template<typename Node, typename Self>
+auto get_collection(Self& self, std::true_type)
+CORUJA_DECLTYPE_AUTO_RETURN(
+    typename Node::get_collection{}(*self.obj)
+)
+
+template<typename Node, typename Self>
+auto get_collection(Self& self, std::false_type)
+CORUJA_DECLTYPE_AUTO_RETURN(
+    *self.obj
+    )
+    
+template<typename Self>
+struct sync_with_domain_t<
+    Self,
+    typename std::enable_if<
+        std::is_same<typename Self::parent_t::ctx_t, void>::value>::type>
+{
+    template<typename T>
+    void operator()(coruja::list<T>& o) const {
+        sync_with_domain(self, o, typename T::get_object{}(*self.obj));
+    }
+    
+    template<typename T, typename CheckPolicy, typename P>
+    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
+        sync_with_domain(
+            self, o, get_collection<leaves_impl<T, CheckPolicy, P>>(
+                             self,
+                             typename leaves_impl<T, CheckPolicy, P>::has_get_collection{}));
+    }
+    template<typename T>
+    void operator()(T& o) const {
+        auto&& lvalue = typename T::get_object{}(*self.obj);
+        o = T(lvalue, self);
+    }
+    Self& self;
 };
 
 template<typename Node>
 struct assign_sync_with_domain_t {
-    template<typename T, typename CheckPolicy, typename P>
-    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
-    }
-    
     template<typename T>
     void operator()(coruja::list<T>& o) const {
     }
+    template<typename T, typename CheckPolicy, typename P>
+    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {}
     template<typename T>
     void operator()(T& o) const {
+        // auto&& lvalue = typename T::get_object{}(*node.obj);
+        // o = T(lvalue, node);
         typename T::type tmp; //dummy
         o = T(tmp, node);
     }

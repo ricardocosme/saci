@@ -2,8 +2,10 @@
 
 #include <saci/tree/model/branch.hpp>
 #include <boost/serialization/saci/check.hpp>
+#include <boost/serialization/version.hpp>
 
 #include <boost/fusion/include/size.hpp>
+#include <boost/fusion/include/is_sequence.hpp>
 #include <boost/serialization/coruja_object.hpp>
 
 namespace boost { namespace serialization {
@@ -11,18 +13,44 @@ namespace boost { namespace serialization {
 template<typename Archive>
 struct save_child_branch_node {
     template<typename T>
+    void operator()(const coruja::list<T>& o) const
+    {
+        ar << o.size();
+        for(auto& e : o) {
+            ar << node_obj_id(*e.obj);
+            ar << e;
+        }
+    }
+
+    template<typename T, typename CheckPolicy, typename Parent>
+    void operator()(const saci::tree::leaves_impl<T, CheckPolicy, Parent>& o) const
+    {
+        ar << o.size();
+        for(auto& e : o) {
+            ar << node_obj_id(*e.obj);
+            ar << e;
+        }
+    }
+    template<typename T>
     void operator()(T& o) const
     { ar << o; }
     Archive& ar;
 };
 
-template<typename Archive>
-struct load_child_branch_node {
-    template<typename T>
-    void operator()(T& o) const
-    { ar >> o; }
-    Archive& ar;
-};
+template<typename Archive, typename BranchNode>
+inline void save_impl(Archive& ar, BranchNode& o, unsigned int version,
+                      boost::mpl::true_)
+{
+    ar << static_cast<std::size_t>(boost::fusion::size(o.children));
+    boost::fusion::for_each(o.children, save_child_branch_node<Archive>{ar});
+}
+
+template<typename Archive, typename BranchNode>
+inline void save_impl(Archive& ar, BranchNode& o, unsigned int version,
+                      boost::mpl::false_)
+{
+    save_child_branch_node<Archive>{ar}(o.children);
+}
 
 template<typename Archive,
          typename T,
@@ -38,8 +66,79 @@ inline void save(Archive& ar,
         T, CheckPolicy, Children, Parent>;
     ar << o.expand;
     save_check(ar, o, typename branch_t::check_t{});
-    ar << static_cast<std::size_t>(boost::fusion::size(o.children));
-    boost::fusion::for_each(o.children, save_child_branch_node<Archive>{ar});
+    save_impl(ar, o, version,
+              boost::fusion::traits::is_sequence<typename branch_t::children_t>{});
+}
+
+template<typename Archive>
+struct load_child_branch_node {
+    template<typename T>
+    void operator()(coruja::list<T>& o) const
+    {
+        std::size_t n;
+        ar >> n;
+        for(std::size_t i(0); i < n; ++i) {
+            std::string id;
+            ar >> id;
+            auto it = std::find_if
+                (o.begin(), o.end(),
+                 [&id](T& child){ return id == node_obj_id(*child.obj); });
+            if(it != o.end())
+                ar >> *it;
+            else {
+                T skipped;
+                ar >> skipped;
+            }
+        }
+    }
+    
+    template<typename T, typename CheckPolicy, typename Parent>
+    void operator()(saci::tree::leaves_impl<T, CheckPolicy, Parent>& o) const
+    {
+        std::cout << "[leaves_impl load]" << std::endl;
+        std::size_t n;
+        ar >> n;
+        std::cout << "leaves="
+                  << n << std::endl;
+        for(std::size_t i(0); i < n; ++i) {
+            std::string id;
+            ar >> id;
+            auto it = std::find_if
+                (o.begin(), o.end(),
+                 [&id](typename saci::tree::leaves_impl<T, CheckPolicy, Parent>::value_type& child){ return id == node_obj_id(*child.obj); });
+            if(it != o.end())
+                ar >> *it;
+            else {
+                typename saci::tree::leaves_impl<T, CheckPolicy, Parent>::value_type skipped;
+                ar >> skipped;
+            }
+        }
+    }
+    template<typename T>
+    void operator()(T& o) const
+    {
+        std::cout << "[branch_node load child]" << std::endl;
+        ar >> o;
+    }
+    Archive& ar;
+};
+
+template<typename Archive, typename BranchNode>
+inline void load_impl(Archive& ar, BranchNode& o, unsigned int version,
+                      boost::mpl::true_)
+{
+    std::size_t n;
+    ar >> n;
+    std::cout << "children="
+              << n << std::endl;
+    boost::fusion::for_each(o.children, load_child_branch_node<Archive>{ar});
+}
+
+template<typename Archive, typename BranchNode>
+inline void load_impl(Archive& ar, BranchNode& o, unsigned int version,
+                      boost::mpl::false_)
+{
+    load_child_branch_node<Archive>{ar}(o.children);
 }
 
 template<typename Archive,
@@ -52,13 +151,26 @@ inline void load(Archive& ar,
                  T, CheckPolicy, Children, Parent>& o,
                  unsigned int version)
 {
+    std::cout << "[branch_node load]" << std::endl;
+    //This is a hack to support a previous version that used a class
+    //collection_branch_node to handle a branch_node when T was a
+    //FunctionObject. That specialization had an implementation with a
+    //base class which was serializable. We need here to skip the
+    //metadata generated by Boost.Serialization that is associated to
+    //this base.
+    if(version == 0 &&
+       saci::tree::detail::is_T_function_obj<T, Parent>::value)
+    {
+        std::size_t tmp;
+        ar >> tmp;
+        ar >> tmp;
+    }
     using branch_t = saci::tree::branch_node<
         T, CheckPolicy, Children, Parent>;
     ar >> o.expand;
     load_check(ar, o, typename branch_t::check_t{});
-    std::size_t n;
-    ar >> n;
-    boost::fusion::for_each(o.children, load_child_branch_node<Archive>{ar});
+    load_impl(ar, o, version,
+              boost::fusion::traits::is_sequence<typename branch_t::children_t>{});
 }
 
 template<typename Archive,
@@ -70,6 +182,26 @@ inline void serialize(Archive& ar,
                       saci::tree::branch_node<
                       T, CheckPolicy, Children, Parent>& o,
                       unsigned int version)
-{ split_free(ar, o, version); }
+{
+    split_free(ar, o, version);
+}
+
+template<typename T, unsigned int N>
+struct version_n
+{
+    using type = mpl::int_<N>;
+    BOOST_STATIC_CONSTANT(int, value = version_n::type::value);        
+    BOOST_MPL_ASSERT((                                                 
+        boost::mpl::less<                                              
+            boost::mpl::int_<N>,                                       
+            boost::mpl::int_<256>                                      
+        >                                                              
+    ));                                                                
+};
+
+template<typename T1, typename T2, typename T3, typename T4>
+struct version<saci::tree::branch_node<T1, T2, T3, T4>>
+    : version_n<saci::tree::branch_node<T1, T2, T3, T4>, 1>
+{};
 
 }}

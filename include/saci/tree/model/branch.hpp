@@ -70,21 +70,27 @@ struct branch_node<
     node_base<T, CheckPolicy, Expandable, Parent>>
 {
     using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
-
+    using ctx_t = void;
     using children_t = typename boost::fusion::result_of::as_vector<
         typename boost::mpl::transform<
             Children, detail::apply_node_impl<branch_node>>::type
     >::type;
     
     branch_node() = default;
-    branch_node(T& o, Parent& p) : base(o, p)
-    {boost::fusion::for_each(children, detail::init_children<branch_node>{*this});}
+    branch_node(typename base::type& o, Parent& p) : base(o, p)
+    {
+        // boost::fusion::for_each(children, detail::init_children<branch_node>{*this});
+        boost::fusion::for_each(children, detail::sync_with_domain_t<branch_node>{*this});
+    }
     
     branch_node(branch_node&&) = delete;
     
     branch_node& operator=(branch_node&& rhs) {
         base::operator=(std::move(rhs));
         children = std::move(rhs.children);
+        boost::fusion::for_each
+            (children,
+             detail::assign_sync_with_domain_t<branch_node>{*this});
         boost::fusion::for_each
             (children, detail::update_parent_ptr<branch_node>{*this});
         return *this;
@@ -114,15 +120,18 @@ struct branch_node<
     node_base<T, CheckPolicy, Expandable, Parent>>
 {
     using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
+    using ctx_t = void;
 
     using children_t = typename detail::node_impl<
         branch_node, typename boost::mpl::front<Children>::type
     >::type;
+    using child = typename children_t::value_type;
     
     branch_node() = default;
-    branch_node(T& o, Parent& p) : base(o, p)
+    branch_node(typename base::type& o, Parent& p) : base(o, p)
     {
-        detail::init_children<branch_node>{*this}(children);
+        // detail::init_children<branch_node>{*this}(children);
+        detail::sync_with_domain_t<branch_node>{*this}(children);
     }
     
     branch_node(branch_node&&) = delete;
@@ -140,179 +149,6 @@ struct branch_node<
     }
     
     children_t children;
-};
-
-template<typename Parent,
-         typename CheckPolicy,
-         typename GetContainer,
-         typename Child
->
-struct collection_branch_node_impl
-    : coruja::observer_class<
-    collection_branch_node_impl<Parent,CheckPolicy, GetContainer, Child>,
-    node_base<typename std::remove_reference<
-                    typename std::result_of<
-                        GetContainer(typename Parent::type&)
-                            >::type
-                  >::type,
-              CheckPolicy, Expandable,
-              Parent>>
-{
-    using T = typename std::remove_reference<
-        typename std::result_of<
-            GetContainer(typename Parent::type&)
-                >::type
-        >::type;
-
-    using base = coruja::observer_class<
-        collection_branch_node_impl<Parent, CheckPolicy, GetContainer, Child>,
-        node_base<T, CheckPolicy, Expandable, Parent>>;
-
-    using check_t = CheckPolicy;
-    using children_t = typename detail::node_impl<
-        collection_branch_node_impl, Child>::type;
-    using child = typename children_t::value_type;
-
-    using get_object = GetContainer;
-    
-    collection_branch_node_impl() = default;
-    collection_branch_node_impl(T& pobj, Parent& p) : base(pobj, p)
-    {
-        sync_with_domain(*this, pobj);
-    }
-    
-    collection_branch_node_impl(collection_branch_node_impl&&) = delete;
-    collection_branch_node_impl& operator=(collection_branch_node_impl&& rhs) {
-        base::operator=(std::move(rhs));
-        children = std::move(rhs.children);
-        detail::update_parent_ptr<collection_branch_node_impl>
-            {*this}(children);
-        return *this;
-    }
-    
-    void update_parent_ptr(Parent& p) {
-        base::update_parent_ptr(p);
-        detail::update_parent_ptr<collection_branch_node_impl>
-        {*this}(children);
-    }
-    
-    children_t children;
-};
-
-template<typename Parent,
-         typename CheckPolicy,
-         typename GetContainer,
-         typename Children
->
-struct collection_branch_node_children_impl
-    : coruja::observer_class<
-    collection_branch_node_children_impl<Parent,CheckPolicy, GetContainer, Children>,
-    node_base<typename std::remove_reference<
-                    typename std::result_of<
-                        GetContainer(typename Parent::type&)
-                            >::type
-                  >::type,CheckPolicy, Expandable, Parent
-                >>
-{
-    using T = typename std::remove_reference<
-        typename std::result_of<
-            GetContainer(typename Parent::type&)
-                >::type
-        >::type;
-
-    using collection_child = typename boost::mpl::deref<
-        typename boost::mpl::find_if<
-            Children, is_collection_leaf<typename T::value_type>>::type>::type;
-    
-    using base = coruja::observer_class<
-        collection_branch_node_children_impl<Parent, CheckPolicy, GetContainer, Children>,
-        node_base<T, CheckPolicy, Expandable, Parent>>;
-
-    using check_t = CheckPolicy;
-
-    using children_t = typename boost::fusion::result_of::as_vector<
-        typename boost::mpl::transform<
-            Children, detail::apply_node_impl<collection_branch_node_children_impl>>::type
-    >::type;
-    using get_object = GetContainer;
-    
-    collection_branch_node_children_impl() = default;
-    collection_branch_node_children_impl(T& pobj, Parent& p) : base(pobj, p)
-    {
-        boost::fusion::for_each
-            (children,
-             detail::sync_with_domain_t<collection_branch_node_children_impl>{*this});
-    }
-    
-    collection_branch_node_children_impl(collection_branch_node_children_impl&&) = delete;
-    collection_branch_node_children_impl& operator=(collection_branch_node_children_impl&& rhs) {
-        base::operator=(std::move(rhs));
-        children = std::move(rhs.children);
-        boost::fusion::for_each
-            (children,
-             detail::assign_sync_with_domain_t<collection_branch_node_children_impl>{*this});
-        boost::fusion::for_each
-            (children, detail::update_parent_ptr
-             <collection_branch_node_children_impl>{*this});
-        return *this;
-    }
-    
-    void update_parent_ptr(Parent& p) {
-        base::update_parent_ptr(p);
-        boost::fusion::for_each
-            (children, detail::update_parent_ptr
-             <collection_branch_node_children_impl>{*this});
-    }
-    
-    children_t children;
-};
-
-template<typename Parent,
-         typename CheckPolicy,
-         typename GetContainer,
-         typename Children,
-         typename Check = void
->
-struct collection_branch_node;
-
-template<typename Parent,
-         typename CheckPolicy,
-         typename GetContainer,
-         typename Children
->
-struct collection_branch_node<
-    Parent,
-    CheckPolicy,
-    GetContainer,
-    Children,
-    typename std::enable_if<boost::mpl::size<Children>::value == 1>::type
->
-    : collection_branch_node_impl<Parent, CheckPolicy, GetContainer,
-                                  typename boost::mpl::front<Children>::type>
-{
-    using base = collection_branch_node_impl<
-        Parent, CheckPolicy, GetContainer,
-        typename boost::mpl::front<Children>::type>;
-    using base::base;
-};
-
-template<typename Parent,
-         typename CheckPolicy,
-         typename GetContainer,
-         typename Children
->
-struct collection_branch_node<
-    Parent,
-    CheckPolicy,
-    GetContainer,
-    Children,
-    typename std::enable_if<!(boost::mpl::size<Children>::value == 1)>::type
->
-    : collection_branch_node_children_impl<Parent, CheckPolicy, GetContainer, Children>
-{
-    using base = collection_branch_node_children_impl<
-        Parent, CheckPolicy, GetContainer, Children>;
-    using base::base;
 };
 
 }}

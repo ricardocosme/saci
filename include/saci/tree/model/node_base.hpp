@@ -14,25 +14,6 @@
 
 namespace saci { namespace tree {
 
-template<typename T, typename Enable = void>
-struct node_base_type;
-
-template<typename T>
-struct node_base_type<
-    T,
-    typename std::enable_if<coruja::is_observable_erasable_range<T>::value>::type
-> {
-    using type = typename T::value_type;
-};
-
-template<typename T>
-struct node_base_type<
-    T,
-    typename std::enable_if<!coruja::is_observable_erasable_range<T>::value>::type
-> {
-    using type = T;
-};
-
 template<typename Object,
          typename CheckPolicy,
          typename ExpandPolicy,
@@ -52,9 +33,7 @@ struct node_base<
     detail::enable_if_T_is_function_obj<GetObject, Parent>
 >
     : node_base_common<
-    typename node_base_type<
-        typename detail::result_of_get_object<GetObject, Parent>
-        >::type,
+    typename detail::result_of_get_object<GetObject, Parent>,
           CheckPolicy,
           ExpandPolicy,
           Parent>
@@ -62,8 +41,8 @@ struct node_base<
     //TODO I need to handle the case that GetObject returns a
     //ObservableErasableRange and the other that occurs when the
     //function returns an object.
-    using type = typename node_base_type<
-        typename detail::result_of_get_object<GetObject, Parent>>::type;
+    using type =
+        typename detail::result_of_get_object<GetObject, Parent>;
     using base = node_base_common<
         type,
         CheckPolicy,
@@ -74,6 +53,11 @@ struct node_base<
     using get_object = GetObject;
 };
 
+template<typename T, typename Parent>
+struct identity {
+    T operator()(typename Parent::type& o) const
+        { return T{}; }
+};
 template<typename Object,
          typename CheckPolicy,
          typename ExpandPolicy,
@@ -99,6 +83,7 @@ struct node_base<
     using base::base;
     
     using type = Object;
+    using get_object = identity<type, Parent>;
 };
 
 }}
