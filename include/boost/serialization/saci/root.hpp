@@ -25,20 +25,14 @@ inline void load(Archive& ar,
                  saci::tree::root<T, CheckPolicy, Child>& o,
                  unsigned int version)
 {
-    std::cout << "[root load]" << std::endl;
     ar >> o.expand;
     std::size_t n;
     ar >> n;
-    std::cout << "children="
-              << n << std::endl;
     using root_t = saci::tree::root<T, CheckPolicy, Child>;
     using child_t = typename root_t::child;
     for(std::size_t i(0); i < n; ++i) {
         std::string id;
         ar >> id;
-        std::cout << "[child '"
-                  << id
-                  << "'load]" << std::endl;
         auto it = std::find_if(o.children.begin(), o.children.end(),
                                [&id](child_t& child){ return id == node_obj_id(*child.obj); });
         if(it != o.children.end())

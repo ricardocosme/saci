@@ -1,5 +1,8 @@
 #pragma once
 
+#include "saci/tree/model/detail/T_is_function_obj.hpp"
+#include "saci/tree/model/node_base.hpp"
+
 namespace saci { namespace tree { 
 
 template<typename T,

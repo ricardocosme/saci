@@ -4,8 +4,6 @@
 #include "saci/tree/model/detail/tag.hpp"
 #include "saci/tree/model/node_base.hpp"
 
-#include <type_traits>
-
 namespace saci { namespace tree {
 
 template<typename T, typename CheckPolicy>

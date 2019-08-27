@@ -1,6 +1,7 @@
 #pragma once
 
 #include <coruja/object/any_object_view.hpp>
+#include <coruja/object/lift.hpp>
 #include <coruja/object/object.hpp>
 
 namespace saci { namespace tree {

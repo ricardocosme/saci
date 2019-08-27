@@ -1,7 +1,11 @@
 #pragma once
 
+#include "saci/tree/model/leaves_impl.hpp"
+
 #include <boost/fusion/include/find.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <coruja/container/list.hpp>
+#include <coruja/support/macro.hpp>
 
 namespace saci { namespace tree { namespace detail {
 
