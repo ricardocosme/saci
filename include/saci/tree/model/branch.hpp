@@ -64,7 +64,6 @@ struct branch_node<
     branch_node() = default;
     branch_node(typename base::type& o, Parent& p) : base(o, p)
     {
-        // boost::fusion::for_each(children, detail::init_children<branch_node>{*this});
         boost::fusion::for_each(children, detail::sync_with_domain_t<branch_node>{*this});
     }
     
@@ -114,7 +113,6 @@ struct branch_node<
     branch_node() = default;
     branch_node(typename base::type& o, Parent& p) : base(o, p)
     {
-        // detail::init_children<branch_node>{*this}(children);
         detail::sync_with_domain_t<branch_node>{*this}(children);
     }
     
