@@ -37,7 +37,10 @@ struct leaves_impl<
     using base::base;
     
     using get_collection = GetCollection;
-    using has_get_collection = std::true_type;
+
+    using type = GetCollection;
+    using check_t = CheckPolicy;
+    using parent_t = Parent;
 };
 
 template<typename Collection,
@@ -62,7 +65,10 @@ struct leaves_impl<
         UnExpandable,
         Parent>>;
     using base::base;
-    using has_get_collection = std::false_type;
+
+    using type = Collection;
+    using check_t = CheckPolicy;
+    using parent_t = Parent;
 };
 
 }}

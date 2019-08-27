@@ -1,6 +1,7 @@
 #pragma once
 
 #include "saci/tree/model/leaves_impl.hpp"
+#include "saci/tree/model/detail/get_collection.hpp"
 
 #include <boost/fusion/include/find.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -54,18 +55,6 @@ inline void sync_with_domain(Node& node, Nodes&, T& obj)
         });
 }
 
-template<typename Node, typename Self>
-auto get_collection_ctx(Self& self, std::true_type)
-CORUJA_DECLTYPE_AUTO_RETURN(
-    typename Node::get_collection{}(*self.obj, self.parent->ctx)
-)
-
-template<typename Node, typename Self>
-auto get_collection_ctx(Self& self, std::false_type)
-CORUJA_DECLTYPE_AUTO_RETURN(
-    *self.obj
-    )
-
 template<typename Self, typename Enable = void>
 struct sync_with_domain_t;
 
@@ -84,9 +73,7 @@ struct sync_with_domain_t<
     void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
         sync_with_domain(
             self, o,
-            get_collection_ctx<leaves_impl<T, CheckPolicy, P>>(
-                self,
-                typename leaves_impl<T, CheckPolicy, P>::has_get_collection{}));
+            detail::get_collection<leaves_impl<T, CheckPolicy, P>>(self));
     }
     template<typename T>
     void operator()(T& o) const {
@@ -95,18 +82,6 @@ struct sync_with_domain_t<
     }
     Self& self;
 };
-
-template<typename Node, typename Self>
-auto get_collection(Self& self, std::true_type)
-CORUJA_DECLTYPE_AUTO_RETURN(
-    typename Node::get_collection{}(*self.obj)
-)
-
-template<typename Node, typename Self>
-auto get_collection(Self& self, std::false_type)
-CORUJA_DECLTYPE_AUTO_RETURN(
-    *self.obj
-    )
     
 template<typename Self>
 struct sync_with_domain_t<
@@ -122,9 +97,8 @@ struct sync_with_domain_t<
     template<typename T, typename CheckPolicy, typename P>
     void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
         sync_with_domain(
-            self, o, get_collection<leaves_impl<T, CheckPolicy, P>>(
-                             self,
-                             typename leaves_impl<T, CheckPolicy, P>::has_get_collection{}));
+            self, o,
+            detail::get_collection<leaves_impl<T, CheckPolicy, P>>(self));
     }
     template<typename T>
     void operator()(T& o) const {
@@ -143,10 +117,8 @@ struct assign_sync_with_domain_t {
     void operator()(leaves_impl<T, CheckPolicy, P>& o) const {}
     template<typename T>
     void operator()(T& o) const {
-        // auto&& lvalue = typename T::get_object{}(*node.obj);
-        // o = T(lvalue, node);
-        typename T::type tmp; //dummy
-        o = T(tmp, node);
+        auto&& lvalue = typename T::get_object{}(*node.obj);
+        o = T(lvalue, node);
     }
     Node& node;
 };
