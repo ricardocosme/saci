@@ -3,6 +3,8 @@
 #include "saci/tree/model/detail/T_is_function_obj.hpp"
 #include "saci/tree/model/node_base.hpp"
 
+#include <coruja/container/list.hpp>
+
 namespace saci { namespace tree { 
 
 template<typename T,
