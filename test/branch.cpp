@@ -99,30 +99,29 @@ int main() {
     }
     
     {
-        // auto persons = build_persons();
+        auto persons = build_persons();
     
-        // using tree_t =
-        //     root<persons_t, UnCheckable,
-        //          branches<persons_t, Checkable,
-        //                   branch<Skills, UnCheckable,
-        //                          leaves<std::string, UnCheckable>
-        //                          >
-        //                   >
-        //          >;
-        // tree_t root(persons);
+        using tree_t =
+            root<persons_t, UnCheckable,
+                 branches<persons_t, Checkable,
+                          branch<Skills, UnCheckable,
+                                 leaves<coruja::list<std::string>, UnCheckable>
+                                 >
+                          >
+                 >;
+        tree_t root(persons);
 
-        // auto& persons_nodes = root.children;
+        auto& persons_nodes = root.children;
         
-        // BOOST_TEST(persons_nodes.front().obj->name == "joao");
-        // BOOST_TEST(std::next(persons_nodes.begin())->obj->name == "maria");
-        // BOOST_TEST(persons_nodes.back().obj->name == "alberto");
+        BOOST_TEST(persons_nodes.front().obj->name == "joao");
+        BOOST_TEST(std::next(persons_nodes.begin())->obj->name == "maria");
+        BOOST_TEST(persons_nodes.back().obj->name == "alberto");
 
-        // auto& skills_node = persons_nodes.front().children;
-        // auto& skills_nodes = skills_node.children;
+        auto& skills_node = persons_nodes.front().children;
+        auto& skills_nodes = skills_node.children;
         
-        // BOOST_TEST(skills_nodes.size() == 2);
-        // BOOST_TEST(*skills_nodes.front().obj == "woodworking");
-        // BOOST_TEST(*skills_nodes.back().obj == "cooking");
+        BOOST_TEST(skills_nodes.size() == 2);
+        BOOST_TEST(*skills_nodes.front().obj == "woodworking");
+        BOOST_TEST(*skills_nodes.back().obj == "cooking");
     }
-    
 }
