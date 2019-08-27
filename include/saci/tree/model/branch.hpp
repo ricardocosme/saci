@@ -110,7 +110,6 @@ struct branch_node<
     using children_t = typename detail::node_impl<
         branch_node, typename boost::mpl::front<Children>::type
     >::type;
-    using child = typename children_t::value_type;
     
     branch_node() = default;
     branch_node(typename base::type& o, Parent& p) : base(o, p)
