@@ -73,26 +73,26 @@ int main() {
     // }
 
     {
-        static_assert(coruja::is_observable_erasable_range<coruja::list<std::string>>::value, "");
-        static_assert(!coruja::is_observable_erasable_range<std::string>::value, "");
         auto persons = build_persons();
     
         using tree_t =
             root<persons_t, UnCheckable,
                  branches<persons_t, Checkable,
                           leaves<Skills, UnCheckable>
-                          // leaf<Name, UnCheckable>
-                          // leaf<person_t, UnCheckable>,
-                          >
+                     >
                  >;
-        tree_t t(persons);
-    
-        // BOOST_TEST(name(t.children.front()) == "joao");
-        // BOOST_TEST(name(*std::next(t.children.begin())) == "maria");
-        // BOOST_TEST(name(t.children.back()) == "alberto");
+        tree_t root(persons);
 
-        BOOST_TEST(t.children.front().children.size() == 2);
-        // BOOST_TEST(skills(t.children.back()).empty());
+        auto& persons_nodes = root.children;
+        
+        BOOST_TEST(persons_nodes.front().obj->name == "joao");
+        BOOST_TEST(std::next(persons_nodes.begin())->obj->name == "maria");
+        BOOST_TEST(persons_nodes.back().obj->name == "alberto");
+
+        auto& skills_nodes = persons_nodes.front().children;
+        BOOST_TEST(skills_nodes.size() == 2);
+        BOOST_TEST(*skills_nodes.front().obj == "woodworking");
+        BOOST_TEST(*skills_nodes.back().obj == "cooking");
     }
     
     {
