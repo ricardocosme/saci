@@ -73,9 +73,6 @@ struct branch_node<
         base::operator=(std::move(rhs));
         children = std::move(rhs.children);
         boost::fusion::for_each
-            (children,
-             detail::assign_sync_with_domain_t<branch_node>{*this});
-        boost::fusion::for_each
             (children, detail::update_parent_ptr<branch_node>{*this});
         return *this;
     }

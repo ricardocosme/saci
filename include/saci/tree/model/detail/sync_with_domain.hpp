@@ -78,20 +78,5 @@ struct sync_with_domain_t
     Self& self;
 };
 
-template<typename Node>
-struct assign_sync_with_domain_t {
-    template<typename T>
-    void operator()(coruja::list<T>& o) const {
-    }
-    template<typename T, typename CheckPolicy, typename P>
-    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {}
-    template<typename T>
-    void operator()(T& o) const {
-        auto&& lvalue = typename T::get_object{}(*node.obj);
-        o = T(lvalue, node);
-    }
-    Node& node;
-};
-
 }}}
 
