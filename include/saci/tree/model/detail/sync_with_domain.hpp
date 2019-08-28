@@ -42,14 +42,12 @@ inline void sync_with_domain(Node& node, Nodes&, T& obj)
     node.observe_for_each
         (obj, [](Node& self, typename T::value_type& o)
         {
-            // auto& nodes = *boost::fusion::find<Nodes>(self.children);
             auto& nodes = get_nodes<Nodes>(self.children);
             nodes.emplace_back(o, self);
         });
         
     node.observe_before_erase
         (obj, [](Node& self, typename T::value_type& o) {
-            // auto& nodes = *boost::fusion::find<Nodes>(self.children);
             auto& nodes = get_nodes<Nodes>(self.children);
             nodes.remove_if([&o](typename Nodes::value_type& node)
             { return &o == node.obj; });
