@@ -53,11 +53,6 @@ struct node_base<
     using get_object = GetObject;
 };
 
-template<typename T, typename Parent>
-struct identity {
-    T operator()(typename Parent::type& o) const
-        { return T{}; }
-};
 template<typename Object,
          typename CheckPolicy,
          typename ExpandPolicy,
@@ -83,7 +78,6 @@ struct node_base<
     using base::base;
     using T = Object;
     using type = Object;
-    using get_object = identity<type, Parent>;
 };
 
 }}
