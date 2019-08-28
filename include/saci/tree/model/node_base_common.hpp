@@ -11,6 +11,16 @@
 
 namespace saci { namespace tree {
 
+struct dummy_parent {
+    using type = int;
+};
+
+template<typename Object,
+         typename CheckPolicy,
+         typename ExpandPolicy,
+         typename Parent>
+struct node_base_common;
+
 template<typename Object,
          typename CheckPolicy,
          typename ExpandPolicy,
@@ -45,6 +55,37 @@ struct node_base_common
     }
     
     parent_t* parent{nullptr};
+    Object* obj{nullptr};
+};
+
+template<typename Object,
+         typename CheckPolicy,
+         typename ExpandPolicy>
+struct node_base_common<
+    Object,
+    CheckPolicy,
+    ExpandPolicy,
+    dummy_parent>
+    : detail::visibility<
+          node_base_common<Object, CheckPolicy, ExpandPolicy, dummy_parent>,
+          CheckPolicy>
+    , detail::expand<ExpandPolicy>
+{
+    using visibility_base = detail::visibility<
+        node_base_common, CheckPolicy>;
+    using expand_base = detail::expand<ExpandPolicy>;
+
+    using check_t = CheckPolicy;
+    using expand_t = ExpandPolicy;
+    
+    node_base_common() = default;
+    
+    node_base_common(Object& _obj)
+        : visibility_base()
+        , expand_base()
+        , obj(&_obj)
+    {}
+
     Object* obj{nullptr};
 };
 
