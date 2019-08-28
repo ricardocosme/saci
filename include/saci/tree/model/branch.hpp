@@ -51,17 +51,23 @@ struct branch_node<
     Parent,
     typename std::enable_if<boost::mpl::size<Children>::value >= 2>::type
 > : coruja::observer_class<
-    branch_node<T, CheckPolicy, Children, Parent>,
-    node_base<T, CheckPolicy, Expandable, Parent>>
+        branch_node<T, CheckPolicy, Children, Parent>,
+        node_base<T, CheckPolicy, Expandable, Parent>
+    >
 {
-    using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
+    using base = coruja::observer_class<
+        branch_node,
+        node_base<T, CheckPolicy, Expandable, Parent>>;
+    
     using ctx_t = void;
+    
     using children_t = typename boost::fusion::result_of::as_vector<
         typename boost::mpl::transform<
             Children, detail::apply_node_impl<branch_node>>::type
     >::type;
     
     branch_node() = default;
+    
     branch_node(typename base::type& o, Parent& p) : base(o, p)
     {
         boost::fusion::for_each(children, detail::sync_with_domain_t<branch_node>{*this});
@@ -97,10 +103,14 @@ struct branch_node<
     Parent,
     typename std::enable_if<boost::mpl::size<Children>::value == 1>::type
 > : coruja::observer_class<
-    branch_node<T, CheckPolicy, Children, Parent>,
-    node_base<T, CheckPolicy, Expandable, Parent>>
+        branch_node<T, CheckPolicy, Children, Parent>,
+        node_base<T, CheckPolicy, Expandable, Parent>
+    >
 {
-    using base = coruja::observer_class<branch_node, node_base<T, CheckPolicy, Expandable, Parent>>;
+    using base = coruja::observer_class<
+        branch_node,
+        node_base<T, CheckPolicy, Expandable, Parent>>;
+    
     using ctx_t = void;
 
     using children_t = typename detail::node_impl<
@@ -108,6 +118,7 @@ struct branch_node<
     >::type;
     
     branch_node() = default;
+    
     branch_node(typename base::type& o, Parent& p) : base(o, p)
     {
         detail::sync_with_domain_t<branch_node>{*this}(children);
