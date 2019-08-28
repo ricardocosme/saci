@@ -24,7 +24,7 @@ CORUJA_DECLTYPE_AUTO_RETURN (
     get_collection_ctx_aux<LeavesImpl>(
         self,
         typename std::is_same<typename Self::parent_t::ctx_t, void>::type{})
-    )
+)
     
 template<typename LeavesImpl, typename Self>
 auto get_collection_aux(Self& self, std::false_type)

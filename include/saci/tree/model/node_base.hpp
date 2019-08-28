@@ -49,7 +49,7 @@ struct node_base<
         ExpandPolicy,
         Parent>;
     using base::base;
-    
+    using T = GetObject;
     using get_object = GetObject;
 };
 
@@ -81,7 +81,7 @@ struct node_base<
         ExpandPolicy,
         Parent>;
     using base::base;
-    
+    using T = Object;
     using type = Object;
     using get_object = identity<type, Parent>;
 };

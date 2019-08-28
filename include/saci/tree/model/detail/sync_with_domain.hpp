@@ -2,6 +2,7 @@
 
 #include "saci/tree/model/leaves_impl.hpp"
 #include "saci/tree/model/detail/get_collection.hpp"
+#include "saci/tree/model/detail/get_object.hpp"
 
 #include <boost/fusion/include/find.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -55,18 +56,12 @@ inline void sync_with_domain(Node& node, Nodes&, T& obj)
         });
 }
 
-template<typename Self, typename Enable = void>
-struct sync_with_domain_t;
-
 template<typename Self>
-struct sync_with_domain_t<
-    Self,
-    typename std::enable_if<
-        !std::is_same<typename Self::parent_t::ctx_t, void>::value>::type>
+struct sync_with_domain_t
 {
     template<typename T>
     void operator()(coruja::list<T>& o) const {
-        sync_with_domain(self, o, typename T::get_object{}(*self.obj, self.parent->ctx));
+        sync_with_domain(self, o, detail::get_object(self, o));
     }
     
     template<typename T, typename CheckPolicy, typename P>
@@ -77,32 +72,7 @@ struct sync_with_domain_t<
     }
     template<typename T>
     void operator()(T& o) const {
-        auto&& lvalue = typename T::get_object{}(*self.obj, self.parent->ctx);
-        o = T(lvalue, self);
-    }
-    Self& self;
-};
-    
-template<typename Self>
-struct sync_with_domain_t<
-    Self,
-    typename std::enable_if<
-        std::is_same<typename Self::parent_t::ctx_t, void>::value>::type>
-{
-    template<typename T>
-    void operator()(coruja::list<T>& o) const {
-        sync_with_domain(self, o, typename T::get_object{}(*self.obj));
-    }
-    
-    template<typename T, typename CheckPolicy, typename P>
-    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
-        sync_with_domain(
-            self, o,
-            detail::get_collection<leaves_impl<T, CheckPolicy, P>>(self));
-    }
-    template<typename T>
-    void operator()(T& o) const {
-        auto&& lvalue = typename T::get_object{}(*self.obj);
+        auto&& lvalue = detail::get_object(self, o);
         o = T(lvalue, self);
     }
     Self& self;
