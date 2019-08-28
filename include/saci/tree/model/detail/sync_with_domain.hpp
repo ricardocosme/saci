@@ -11,23 +11,6 @@
 
 namespace saci { namespace tree { namespace detail {
 
-//Reações responsáveis por sincronizar a hierarquia com o modelo de
-//domínio da aplicação. Inserções e remoções na hierarquia específica
-//da aplicação devem ser refletidas na hierarquia em árvore.
-template<typename Node, typename T>
-inline void sync_with_domain(Node& node, T& obj)
-{
-    node.observe_for_each
-        (obj, [](Node& self, typename T::value_type& o)
-        { self.children.emplace_back(o, self); });
-        
-    node.observe_before_erase
-        (obj, [](Node& self, typename T::value_type& o) {
-            self.children.remove_if([&o](typename Node::children_t::value_type& node)
-            { return &o == node.obj; });
-        });
-}
-
 template<typename Nodes, typename T>
 coruja::list<T>& get_nodes(coruja::list<T>& children)
 { return children; }

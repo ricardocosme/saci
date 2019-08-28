@@ -48,7 +48,7 @@ struct root<ObservableErasableRange,
         : base()
         , obj(&pobj)
         , ctx(&pctx)
-    { detail::sync_with_domain(*this, pobj); }
+    { detail::sync_with_domain(*this, children, pobj); }
     
     root(root&& rhs)
         : base(std::move(rhs))
@@ -102,7 +102,7 @@ struct root<ObservableErasableRange,
     root(type& pobj)
         : base()
         , obj(&pobj)
-    { sync_with_domain(*this, pobj); }
+    { sync_with_domain(*this, children, pobj); }
     
     root(root&& rhs)
         : base(std::move(rhs))
