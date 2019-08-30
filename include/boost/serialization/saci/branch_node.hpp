@@ -31,6 +31,17 @@ struct save_child_branch_node {
             ar << e;
         }
     }
+
+    template<typename T, typename CheckPolicy, typename Children, typename Parent>
+    void operator()(const saci::tree::branches_impl<T, CheckPolicy, Children, Parent>& o) const
+    {
+        ar << o.size();
+        for(auto& e : o) {
+            ar << node_obj_id(*e.obj);
+            ar << e;
+        }
+    }
+    
     template<typename T>
     void operator()(T& o) const
     { ar << o; }
@@ -111,6 +122,27 @@ struct load_child_branch_node {
             }
         }
     }
+
+    template<typename T, typename CheckPolicy, typename Children, typename Parent>
+    void operator()(saci::tree::branches_impl<T, CheckPolicy, Children, Parent>& o) const
+    {
+        std::size_t n;
+        ar >> n;
+        for(std::size_t i(0); i < n; ++i) {
+            std::string id;
+            ar >> id;
+            auto it = std::find_if
+                (o.begin(), o.end(),
+                 [&id](typename saci::tree::branches_impl<T, CheckPolicy, Children, Parent>::value_type& child){ return id == node_obj_id(*child.obj); });
+            if(it != o.end())
+                ar >> *it;
+            else {
+                typename saci::tree::branches_impl<T, CheckPolicy, Children, Parent>::value_type skipped;
+                ar >> skipped;
+            }
+        }
+    }
+    
     template<typename T>
     void operator()(T& o) const
     { ar >> o; }

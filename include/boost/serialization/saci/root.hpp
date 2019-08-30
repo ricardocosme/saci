@@ -29,7 +29,7 @@ inline void load(Archive& ar,
     std::size_t n;
     ar >> n;
     using root_t = saci::tree::root<T, CheckPolicy, Child>;
-    using child_t = typename root_t::child;
+    using child_t = typename root_t::children_t::value_type;
     for(std::size_t i(0); i < n; ++i) {
         std::string id;
         ar >> id;

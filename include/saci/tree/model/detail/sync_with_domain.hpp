@@ -1,5 +1,6 @@
 #pragma once
 
+#include "saci/tree/model/branches_impl.hpp"
 #include "saci/tree/model/leaves_impl.hpp"
 #include "saci/tree/model/detail/get_collection.hpp"
 #include "saci/tree/model/detail/get_object.hpp"
@@ -51,6 +52,14 @@ struct sync_with_domain_t
             self, o,
             detail::get_collection<leaves_impl<T, CheckPolicy, P>>(self));
     }
+
+    template<typename T, typename CheckPolicy, typename C, typename P>
+    void operator()(branches_impl<T, CheckPolicy, C, P>& o) const {
+        sync_with_domain(
+            self, o,
+            detail::get_collection<branches_impl<T, CheckPolicy, C, P>>(self));
+    }
+    
     template<typename T>
     void operator()(T& o) const {
         auto&& lvalue = detail::get_object(self, o);

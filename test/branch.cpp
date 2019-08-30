@@ -10,6 +10,7 @@
 #include <iostream>
 #include <initializer_list>
 #include <string>
+#include <unordered_map>
 
 struct person_t {
     std::string name;
@@ -26,6 +27,17 @@ struct Name {
 struct Skills {
     coruja::list<std::string>& operator()(person_t& o)
     { return o.skills; }
+};
+    
+using person2children_t = std::unordered_map<person_t*, coruja::list<std::string>>;
+struct persons_traits_t {
+    person2children_t person2children;
+};
+
+struct Children {
+    coruja::list<std::string>& operator()(person_t& o,
+                                          persons_traits_t* ctx = nullptr)
+    { return ctx->person2children.at(&o); }
 };
 
 template<typename Node>
@@ -123,5 +135,37 @@ int main() {
         BOOST_TEST(skills_nodes.size() == 2);
         BOOST_TEST(*skills_nodes.front().obj == "woodworking");
         BOOST_TEST(*skills_nodes.back().obj == "cooking");
+    }
+    {
+        auto persons = build_persons();
+        
+        using tree_t =
+            root<with_ctx<persons_t, persons_traits_t>, UnCheckable,
+                 branches<persons_t, Checkable,
+                          branches<Children, Checkable,
+                                   leaf<std::string, UnCheckable>
+                                   >
+                          >
+                 >;
+        persons_traits_t traits;
+        traits.person2children.emplace(
+            &persons.front(), coruja::list<std::string>{"child1", "child2"});
+        traits.person2children.emplace(
+            &*std::next(persons.begin()), coruja::list<std::string>{"child1", "child2"});
+        traits.person2children.emplace(
+            &persons.back(), coruja::list<std::string>{"child1", "child2"});
+        tree_t root(persons, traits);
+
+        auto& persons_nodes = root.children;
+        
+        BOOST_TEST(persons_nodes.front().obj->name == "joao");
+        BOOST_TEST(std::next(persons_nodes.begin())->obj->name == "maria");
+        BOOST_TEST(persons_nodes.back().obj->name == "alberto");
+
+        auto& children_nodes = persons_nodes.front().children;
+        
+        BOOST_TEST(children_nodes.size() == 2);
+        BOOST_TEST(*children_nodes.front().obj == "child1");
+        BOOST_TEST(*children_nodes.back().obj == "child2");
     }
 }

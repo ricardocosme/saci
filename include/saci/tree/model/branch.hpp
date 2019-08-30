@@ -2,9 +2,7 @@
 
 #include "saci/tree/model/detail/apply_node_impl.hpp"
 #include "saci/tree/model/detail/node_impl_fwd.hpp"
-#include "saci/tree/model/detail/sync_with_domain.hpp"
 #include "saci/tree/model/detail/tag.hpp"
-#include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/visibility.hpp"
 #include "saci/tree/model/node_base.hpp"
 
@@ -19,6 +17,14 @@
 
 namespace saci { namespace tree {
 
+namespace detail {
+template<typename Self>
+struct sync_with_domain_t;
+
+template<typename Parent>
+struct update_parent_ptr;
+}
+
 template<typename T, typename CheckPolicy, typename...Children>
 struct branch : detail::tag_branch {
     using type = T;
@@ -28,7 +34,7 @@ struct branch : detail::tag_branch {
 
 template<typename ObservableErasableRange, typename CheckPolicy, typename...Children>
 struct branches : detail::tag_branches {
-    using type = typename ObservableErasableRange::value_type;
+    using type = ObservableErasableRange;
     using check_t = CheckPolicy;
     using children = boost::mpl::vector<Children...>;
 };
@@ -144,3 +150,5 @@ struct branch_node<
 }}
 
 #include "saci/tree/model/detail/branch.hpp"
+#include "saci/tree/model/detail/update_parent_ptr.hpp"
+#include "saci/tree/model/detail/sync_with_domain.hpp"
