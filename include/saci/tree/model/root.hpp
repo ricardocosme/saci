@@ -45,10 +45,10 @@ struct root<ObservableErasableRange,
     using child = typename children_t::value_type;
     
     root() = default;
-    root(typename base::type& pobj, ctx_t& pctx)
+    explicit root(typename base::type& pobj, ctx_t& pctx)
         : base(pobj)
         , ctx(&pctx)
-    { detail::sync_with_domain(*this, children, pobj); }
+    { detail::sync_with_domain<children_t>(*this, pobj); }
     
     root(root&& rhs)
         : base(std::move(rhs))
@@ -92,9 +92,9 @@ struct root<ObservableErasableRange,
     using child = typename children_t::value_type;
     
     root() = default;
-    root(typename base::type& pobj)
+    explicit root(typename base::type& pobj)
         : base(pobj)
-    { sync_with_domain(*this, children, pobj); }
+    { detail::sync_with_domain<children_t>(*this, pobj); }
     
     root(root&& rhs)
         : base(std::move(rhs))

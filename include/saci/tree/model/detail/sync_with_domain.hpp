@@ -12,29 +12,26 @@
 
 namespace saci { namespace tree { namespace detail {
 
-template<typename Nodes, typename T>
-coruja::list<T>& get_nodes(coruja::list<T>& children)
+template<typename Children, typename T>
+inline coruja::list<T>& get_children(coruja::list<T>& children)
 { return children; }
 
-template<typename Nodes, typename... T>
-Nodes& get_nodes(boost::fusion::vector<T...>& children)
-{ return *boost::fusion::find<Nodes>(children); }
+template<typename Children, typename... T>
+inline Children& get_children(boost::fusion::vector<T...>& children)
+{ return *boost::fusion::find<Children>(children); }
 
-template<typename Node, typename Nodes, typename T>
-inline void sync_with_domain(Node& node, Nodes&, T& obj)
+template<typename Children, typename Node, typename Model>
+inline void sync_with_domain(Node& node, Model& model)
 {
     node.observe_for_each
-        (obj, [](Node& self, typename T::value_type& o)
-        {
-            auto& nodes = get_nodes<Nodes>(self.children);
-            nodes.emplace_back(o, self);
-        });
+        (model, [](Node& self, typename Model::value_type& o)
+        { get_children<Children>(self.children).emplace_back(o, self); });
         
     node.observe_before_erase
-        (obj, [](Node& self, typename T::value_type& o) {
-            auto& nodes = get_nodes<Nodes>(self.children);
-            nodes.remove_if([&o](typename Nodes::value_type& node)
-            { return &o == node.obj; });
+        (model, [](Node& self, typename Model::value_type& o) {
+            get_children<Children>(self.children).remove_if(
+                [&o](typename Children::value_type& node)
+                { return &o == node.obj; });
         });
 }
 
@@ -43,21 +40,21 @@ struct sync_with_domain_t
 {
     template<typename T>
     void operator()(coruja::list<T>& o) const {
-        sync_with_domain(self, o, detail::get_object(self, o));
+        sync_with_domain<coruja::list<T>>(self, detail::get_object(self, o));
     }
     
-    template<typename T, typename CheckPolicy, typename P>
-    void operator()(leaves_impl<T, CheckPolicy, P>& o) const {
-        sync_with_domain(
-            self, o,
-            detail::get_collection<leaves_impl<T, CheckPolicy, P>>(self));
+    template<typename T, typename CheckPolicy, typename Parent>
+    void operator()(leaves_impl<T, CheckPolicy, Parent>& o) const {
+        sync_with_domain<leaves_impl<T, CheckPolicy, Parent>>(
+            self,
+            detail::get_collection<leaves_impl<T, CheckPolicy, Parent>>(self));
     }
 
-    template<typename T, typename CheckPolicy, typename C, typename P>
-    void operator()(branches_impl<T, CheckPolicy, C, P>& o) const {
-        sync_with_domain(
-            self, o,
-            detail::get_collection<branches_impl<T, CheckPolicy, C, P>>(self));
+    template<typename T, typename CheckPolicy, typename Children, typename Parent>
+    void operator()(branches_impl<T, CheckPolicy, Children, Parent>& o) const {
+        sync_with_domain<branches_impl<T, CheckPolicy, Children, Parent>>(
+            self,
+            detail::get_collection<branches_impl<T, CheckPolicy, Children, Parent>>(self));
     }
     
     template<typename T>
