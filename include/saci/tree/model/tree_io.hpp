@@ -98,7 +98,7 @@ inline OStream& handle_children_dispatch(OStream& out, const Node& node, UnExpan
 
 template<typename OStream, typename Parent, typename T, typename CheckPolicy>
 inline OStream& handle_children_dispatch(OStream& out,
-                                       const leaf_node<Parent, CheckPolicy, T>& node,
+                                       const leaf_impl<Parent, CheckPolicy, T>& node,
                                        UnExpandable,
                                        std::size_t level)
 { return out; }

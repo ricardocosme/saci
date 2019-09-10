@@ -4,7 +4,6 @@
 #include "saci/tree/model/detail/expand.hpp"
 #include "saci/tree/model/detail/node_impl_fwd.hpp"
 #include "saci/tree/model/detail/sync_with_domain.hpp"
-#include "saci/tree/model/detail/tag.hpp"
 #include "saci/tree/model/detail/update_parent_ptr.hpp"
 #include "saci/tree/model/detail/visibility.hpp"
 #include "saci/tree/model/with_ctx.hpp"
@@ -70,7 +69,7 @@ struct root<ObservableErasableRange,
     
 //TODO Contemplar mais de um filho. root reflete um
 //collection_branch_node sem pai. Avaliar a versão de root que é
-//análoga a branch_node sem pai.(Considerar root como tag e usar node_impl)
+//análoga a branch_impl sem pai.(Considerar root como tag e usar node_impl)
 template<typename ObservableErasableRange,
          typename CheckPolicy,
          typename Children>

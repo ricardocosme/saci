@@ -35,7 +35,7 @@ inline void sync_with_domain(Node& node, Model& model)
         });
 }
 
-template<typename Self>
+template<typename Node>
 struct sync_with_domain_t
 {
     template<typename T>
@@ -62,7 +62,7 @@ struct sync_with_domain_t
         auto&& lvalue = detail::get_object(self, o);
         o = T(lvalue, self);
     }
-    Self& self;
+    Node& self;
 };
 
 }}}

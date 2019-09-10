@@ -1,6 +1,6 @@
 #pragma once
 
-#include "saci/tree/model/detail/get_branch_node.hpp"
+#include "saci/tree/model/detail/get_branch_impl.hpp"
 #include "saci/tree/model/detail/T_is_function_obj.hpp"
 #include "saci/tree/model/node_base.hpp"
 
@@ -26,7 +26,7 @@ struct branches_impl<
     Parent,
     detail::enable_if_T_is_function_obj<GetCollection, Parent>
     > : coruja::list<
-    typename detail::legacy::get_branch_node<
+    typename detail::legacy::get_branch_impl<
         typename detail::result_of_get_object<GetCollection, Parent>::value_type,
         CheckPolicy,
         Children,
@@ -34,7 +34,7 @@ struct branches_impl<
     >
 {
     using base = coruja::list<
-    typename detail::legacy::get_branch_node<
+    typename detail::legacy::get_branch_impl<
         typename detail::result_of_get_object<GetCollection, Parent>::value_type,
         CheckPolicy,
         Children,
@@ -60,7 +60,7 @@ struct branches_impl<
     Parent,
     detail::enable_if_T_is_not_function_obj<Collection, Parent>
     > : coruja::list<
-    typename detail::legacy::get_branch_node<
+    typename detail::legacy::get_branch_impl<
         typename Collection::value_type,
         CheckPolicy,
         Children,
@@ -68,7 +68,7 @@ struct branches_impl<
     >
 {
     using base = coruja::list<
-    typename detail::legacy::get_branch_node<
+    typename detail::legacy::get_branch_impl<
         typename Collection::value_type,
         CheckPolicy,
         Children,

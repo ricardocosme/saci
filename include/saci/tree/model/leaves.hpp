@@ -3,11 +3,12 @@
 namespace saci { namespace tree {
 
 namespace detail {
-struct tag_leaf{};
+struct tag_leaves{};
 } //namespace detail
 
-template<typename T, typename CheckPolicy>
-struct leaf : detail::tag_leaf {
+template<typename T,
+         typename CheckPolicy>
+struct leaves : detail::tag_leaves {
     using type = T;
     using check_t = CheckPolicy;
 };

@@ -5,13 +5,13 @@
 namespace saci { namespace tree {
 
 namespace detail {
-struct tag_branch{};
+struct tag_branches{};
 } //namespace detail
 
 template<typename T,
          typename CheckPolicy,
          typename... Children>
-struct branch : detail::tag_branch {
+struct branches : detail::tag_branches {
     using type = T;
     using check_t = CheckPolicy;
     using children = boost::mpl::vector<Children...>;

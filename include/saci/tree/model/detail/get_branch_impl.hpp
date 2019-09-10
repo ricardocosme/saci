@@ -5,7 +5,7 @@
 namespace saci { namespace tree { namespace detail {
 
 //This is a hack to support serialization of a previous version that
-//uses a class collection_branch_node to handle a branch_node when T
+//uses a class collection_branch_node to handle a branch_impl when T
 //was a FunctionObject. 
 namespace legacy {
 
@@ -17,8 +17,8 @@ template<typename T,
          typename CheckPolicy,
          typename Children,
          typename Parent>
-struct branch_node_base : branch_node<T, CheckPolicy, Children, Parent> {
-    using base = branch_node<T, CheckPolicy, Children, Parent>;
+struct branch_impl_base : branch_impl<T, CheckPolicy, Children, Parent> {
+    using base = branch_impl<T, CheckPolicy, Children, Parent>;
     using base::base;
 };
 
@@ -27,20 +27,20 @@ template<typename T,
          typename Children,
          typename Parent,
          typename Enable = void>
-struct get_branch_node;
+struct get_branch_impl;
 
 template<typename T,
          typename CheckPolicy,
          typename Children,
          typename Parent>
-struct get_branch_node<
+struct get_branch_impl<
     T,
     CheckPolicy,
     Children,
     Parent,
     enable_if_T_is_function_obj<T, Parent>>
 {
-    using type = branch_node_base<
+    using type = branch_impl_base<
         T,
         CheckPolicy,
         Children,
@@ -51,14 +51,14 @@ template<typename T,
          typename CheckPolicy,
          typename Children,
          typename Parent>
-struct get_branch_node<
+struct get_branch_impl<
     T,
     CheckPolicy,
     Children,
     Parent,
     enable_if_T_is_not_function_obj<T, Parent>>
 {
-    using type = branch_node<
+    using type = branch_impl<
         T,
         CheckPolicy,
         Children,
