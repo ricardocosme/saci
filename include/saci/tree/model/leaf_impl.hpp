@@ -8,7 +8,7 @@ namespace saci { namespace tree {
 template<typename T,
          typename CheckPolicy,
          typename Parent>
-using leaf_impl = node_base<T, CheckPolicy, UnExpandable, Parent>;
+using leaf_impl = node_base<T, CheckPolicy, detail::UnExpandable, Parent>;
 
 }}
 

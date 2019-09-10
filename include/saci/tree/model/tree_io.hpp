@@ -20,14 +20,14 @@ inline OStream& out_check(OStream& out, const Node& o)
 { return out_check_dispatch(out, o, typename Node::check_t{}); }
 
 template<typename OStream, typename Node>
-inline OStream& out_expand_dispatch(OStream& out, const Node& o, Expandable)
+inline OStream& out_expand_dispatch(OStream& out, const Node& o, detail::Expandable)
 {
     out << (o.expand.observed() ? '-' : '+');
     return out;
 }
 
 template<typename OStream, typename Node>
-inline OStream& out_expand_dispatch(OStream& out, const Node& o, UnExpandable)
+inline OStream& out_expand_dispatch(OStream& out, const Node& o, detail::UnExpandable)
 {
     out << '-';
     return out;
@@ -80,7 +80,7 @@ inline OStream& out_children(OStream& out, const coruja::list<Child>& children, 
 }
 
 template<typename OStream, typename Node>
-inline OStream& handle_children_dispatch(OStream& out, const Node& node, Expandable,
+inline OStream& handle_children_dispatch(OStream& out, const Node& node, detail::Expandable,
                                        std::size_t level)
 {
     if(node.expand.observed()) 
@@ -89,7 +89,7 @@ inline OStream& handle_children_dispatch(OStream& out, const Node& node, Expanda
 }
 
 template<typename OStream, typename Node>
-inline OStream& handle_children_dispatch(OStream& out, const Node& node, UnExpandable,
+inline OStream& handle_children_dispatch(OStream& out, const Node& node, detail::UnExpandable,
                                        std::size_t level)
 {
     out_children(out, node.children, level);
@@ -99,7 +99,7 @@ inline OStream& handle_children_dispatch(OStream& out, const Node& node, UnExpan
 template<typename OStream, typename Parent, typename T, typename CheckPolicy>
 inline OStream& handle_children_dispatch(OStream& out,
                                        const leaf_impl<Parent, CheckPolicy, T>& node,
-                                       UnExpandable,
+                                       detail::UnExpandable,
                                        std::size_t level)
 { return out; }
 
@@ -114,7 +114,7 @@ operator<<(std::basic_ostream<CharType, CharTrait>& out,
            const root<T, CheckPolicy, Child>& o)
 {
   if (out.good()) {
-      out_expand_dispatch(out, o, Expandable{});
+      out_expand_dispatch(out, o, detail::Expandable{});
       out_check(out, o);
       out<< *o.obj << std::endl;
       handle_children(out, o);      

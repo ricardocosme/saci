@@ -2,12 +2,10 @@
 
 #include <coruja/object/object.hpp>
 
-namespace saci { namespace tree {
+namespace saci { namespace tree { namespace detail {
 
 struct UnExpandable {};
 struct Expandable {};
-
-namespace detail {
 
 template<typename Policy>
 struct expand {};

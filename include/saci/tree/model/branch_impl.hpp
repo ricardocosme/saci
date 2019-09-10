@@ -44,12 +44,12 @@ struct branch_impl<
     typename std::enable_if<boost::mpl::size<Children>::value >= 2>::type
 > : coruja::observer_class<
         branch_impl<T, CheckPolicy, Children, Parent>,
-        node_base<T, CheckPolicy, Expandable, Parent>
+        node_base<T, CheckPolicy, detail::Expandable, Parent>
     >
 {
     using base = coruja::observer_class<
         branch_impl,
-        node_base<T, CheckPolicy, Expandable, Parent>>;
+        node_base<T, CheckPolicy, detail::Expandable, Parent>>;
     
     using ctx_t = void;
     
@@ -96,12 +96,12 @@ struct branch_impl<
     typename std::enable_if<boost::mpl::size<Children>::value == 1>::type
 > : coruja::observer_class<
         branch_impl<T, CheckPolicy, Children, Parent>,
-        node_base<T, CheckPolicy, Expandable, Parent>
+        node_base<T, CheckPolicy, detail::Expandable, Parent>
     >
 {
     using base = coruja::observer_class<
         branch_impl,
-        node_base<T, CheckPolicy, Expandable, Parent>>;
+        node_base<T, CheckPolicy, detail::Expandable, Parent>>;
     
     using ctx_t = void;
 

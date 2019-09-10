@@ -25,14 +25,14 @@ struct leaves_impl<
     node_base<
         typename detail::result_of_get_object<GetCollection, Parent>::value_type,
         CheckPolicy,
-        UnExpandable,
+        detail::UnExpandable,
         Parent>>
 {
     using base = coruja::list<
     node_base<
         typename detail::result_of_get_object<GetCollection, Parent>::value_type,
         CheckPolicy,
-        UnExpandable,
+        detail::UnExpandable,
         Parent>>;
     using base::base;
     
@@ -55,14 +55,14 @@ struct leaves_impl<
     node_base<
         typename Collection::value_type,
         CheckPolicy,
-        UnExpandable,
+        detail::UnExpandable,
         Parent>>
 {
     using base = coruja::list<
     node_base<
         typename Collection::value_type,
         CheckPolicy,
-        UnExpandable,
+        detail::UnExpandable,
         Parent>>;
     using base::base;
 

@@ -8,4 +8,3 @@
 #include "saci/tree/model/leaves.hpp"
 #include "saci/tree/model/leaves_impl.hpp"
 #include "saci/tree/model/root.hpp"
-
