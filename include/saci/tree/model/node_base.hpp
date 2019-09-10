@@ -17,7 +17,7 @@ namespace saci { namespace tree {
 template<typename Object,
          typename CheckPolicy,
          typename ExpandPolicy,
-         typename Parent,
+         typename Parent = dummy_parent,
          typename EnableIfTIsFunctionObj = void>
 struct node_base;
 

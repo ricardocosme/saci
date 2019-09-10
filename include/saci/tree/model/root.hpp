@@ -33,16 +33,14 @@ struct root<ObservableErasableRange,
         root<ObservableErasableRange, CheckPolicy, Children>,
         node_base<typename ObservableErasableRange::type,
                   CheckPolicy,
-                  detail::Expandable,
-                  dummy_parent>
+                  detail::Expandable>
     >
 {
     using base = coruja::observer_class<
         root,
         node_base<typename ObservableErasableRange::type,
                   CheckPolicy,
-                  detail::Expandable,
-                  dummy_parent>
+                  detail::Expandable>
         >;
     
     using ctx_t = typename ObservableErasableRange::ctx_t;
@@ -88,8 +86,7 @@ struct root<ObservableErasableRange,
         node_base<
             ObservableErasableRange,
             CheckPolicy,
-            detail::Expandable,
-            dummy_parent>
+            detail::Expandable>
     >
 {
     using base = coruja::observer_class<
@@ -97,8 +94,7 @@ struct root<ObservableErasableRange,
         node_base<
             ObservableErasableRange,
             CheckPolicy,
-            detail::Expandable,
-            dummy_parent>
+            detail::Expandable>
         >;
     using ctx_t = void;
     using children_t = typename detail::node_impl<root, Children>::type;
