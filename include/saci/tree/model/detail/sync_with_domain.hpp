@@ -20,18 +20,21 @@ template<typename Children, typename... T>
 inline Children& get_children(boost::fusion::vector<T...>& children)
 { return *boost::fusion::find<Children>(children); }
 
-template<typename Children, typename Node, typename Model>
-inline void sync_with_domain(Node& node, Model& model)
+template<typename Children, typename Parent, typename Model>
+inline void sync_with_domain(Parent& parent, Model& model)
 {
-    node.observe_for_each
-        (model, [](Node& self, typename Model::value_type& o)
-        { get_children<Children>(self.children).emplace_back(o, self); });
+    //Constructs a child node for each element of the model.
+    parent.observe_for_each
+        (model, [](Parent& self, typename Model::value_type& model)
+        { get_children<Children>(self.children).emplace_back(model, self); });
         
-    node.observe_before_erase
-        (model, [](Node& self, typename Model::value_type& o) {
+    //Removes the child node related to the element of the model that
+    //will be removed.
+    parent.observe_before_erase
+        (model, [](Parent& self, typename Model::value_type& model) {
             get_children<Children>(self.children).remove_if(
-                [&o](typename Children::value_type& node)
-                { return &o == node.obj; });
+                [&model](typename Children::value_type& child)
+                { return &model == child.obj; });
         });
 }
 

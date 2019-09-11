@@ -11,10 +11,6 @@ struct update_parent_ptr {
     void operator()(T& o) const
     { o.update_parent_ptr(parent); }
     
-    template<typename T>
-    void operator()(coruja::list<T>& o) const
-    { for(auto& e : o) e.update_parent_ptr(parent); }
-    
     template<typename T, typename CheckPolicy, typename P>
     void operator()(leaves_impl<T, CheckPolicy, P>& o) const
     { for(auto& e : o) e.update_parent_ptr(parent); }

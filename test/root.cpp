@@ -7,9 +7,11 @@
 #include <boost/core/lightweight_test.hpp>
 #include <coruja/container/list.hpp>
 #include <saci/tree/model/tree.hpp>
+#include <saci/tree/model/tree_io.hpp>
 
 #include <initializer_list>
 #include <string>
+#include <unordered_map>
 
 using namespace saci::tree;
 
@@ -18,6 +20,8 @@ using onames = coruja::list<name>;
 
 template<typename CheckPolicy>
 using tree_t = root<onames, CheckPolicy, leaves<onames, UnCheckable>>;
+
+static_assert(std::is_same<typename tree_t<Checkable>::ctx_t, void>::value, "");
 
 template<typename Root>
 void equals_to(Root& r, std::initializer_list<name> expected) {
@@ -35,8 +39,31 @@ void sync_with_domain_tests(Root& t, Domain& c) {
     equals_to(t, {"abc", "def", "ghi", "jkl"});
     c.erase(c.begin());
     equals_to(t, {"def", "ghi", "jkl"});
+    auto model_it = c.begin();
+    for(auto& child : t.children) {
+        BOOST_TEST(child.obj == &*model_it++);
+        BOOST_TEST(child.parent == &t);
+    }
     c.clear();
     BOOST_TEST(t.children.empty());
+}
+
+enum class color_t {
+    black,
+    white
+};
+
+struct persons_traits {
+    std::unordered_map<name, color_t> person2color;
+};
+
+namespace std {
+template<typename CharType, typename CharTrait>
+inline std::basic_ostream<CharType, CharTrait>&
+operator<<(std::basic_ostream<CharType, CharTrait>& out, const onames& c)
+{
+    return (out << "Persons");
+}
 }
 
 int main() {
@@ -48,20 +75,21 @@ int main() {
             sync_with_domain_tests(t, c);
         }
     
-        //After move assignment operator
+        //After move assignment operation
         {
             onames c{"abc", "def", "ghi"};
             tree_t<UnCheckable> rhs(c);
-            auto t = std::move(rhs);
-            sync_with_domain_tests(t, c);
+            tree_t<UnCheckable> lhs;
+            lhs = std::move(rhs);
+            sync_with_domain_tests(lhs, c);
         }
 
         //After move ctor
         {
             onames c{"abc", "def", "ghi"};
             tree_t<UnCheckable> rhs(c);
-            tree_t<UnCheckable> t(std::move(rhs));
-            sync_with_domain_tests(t, c);
+            tree_t<UnCheckable> lhs(std::move(rhs));
+            sync_with_domain_tests(lhs, c);
         }
     }
 
@@ -79,7 +107,6 @@ int main() {
     {
         onames c{"abc", "def", "ghi"};
         using tree = root<onames, Checkable, leaves<onames, Checkable>>;
-        // root<onames, Checkable, leaves<onames, Checkable>> t(c);
         tree t(c);
 
         BOOST_TEST(t.check == false);
@@ -94,9 +121,8 @@ int main() {
         }
         t.check = true;
         BOOST_TEST(t.visible == true);
-        for(auto& child : t.children) {
+        for(auto& child : t.children)
             BOOST_TEST(child.visible == true);
-        }
 
         //After move assignment operator
         tree l;
@@ -114,5 +140,28 @@ int main() {
             BOOST_TEST(child.check == true);
             BOOST_TEST(child.visible == true);
         }        
+    }
+
+    //Using an object as a context attached to the ObservableErasableRange
+    {
+        onames c{"abc", "def", "ghi"};
+        using tree = root<with_ctx<onames, persons_traits>,
+                          Checkable,
+                          leaves<onames, Checkable>>;
+        static_assert(std::is_same<tree::ctx_t, persons_traits>::value, "");
+        persons_traits traits;
+        traits.person2color.emplace("abc", color_t::white);
+        traits.person2color.emplace("def", color_t::black);
+        traits.person2color.emplace("ghi", color_t::black);
+        tree t(c, traits);
+        BOOST_TEST(t.ctx == &traits);
+    }
+
+    //tree_io
+    {
+        onames c{"abc", "def", "ghi"};
+        tree_t<Checkable> t(c);
+        t.expand = true;
+        std::cout << t << std::endl;
     }
 }

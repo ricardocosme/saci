@@ -39,11 +39,14 @@ inline OStream& out_expand(OStream& out, const Node& o)
 
 template<typename OStream>
 struct out_child_of_fusion {
-    template<typename T>
-    void operator()(const coruja::list<T>& children) const {
-        out_children(out, children, level);
-    }
+    template<typename T, typename CheckPolicy, typename P>
+    void operator()(const leaves_impl<T, CheckPolicy, P>& children) const
+    { out_children(out, children, level); }
     
+    template<typename T, typename CheckPolicy, typename C, typename P>
+    void operator()(branches_impl<T, CheckPolicy, C, P>& children) const
+    { out_children(out, children, level); }
+
     template<typename T>
     void operator()(T& child) const {
         for(std::size_t i(0); i < level; ++i)
@@ -65,8 +68,8 @@ inline OStream& out_children(OStream& out, const boost::fusion::vector<Children.
     return out;
 }
 
-template<typename OStream, typename Child>
-inline OStream& out_children(OStream& out, const coruja::list<Child>& children, std::size_t level)
+template<typename OStream, typename Children>
+inline OStream& out_children_aux(OStream& out, const Children& children, std::size_t level)
 {
     for(auto& child : children) {
         for(std::size_t i(0); i < level; ++i)
@@ -78,6 +81,14 @@ inline OStream& out_children(OStream& out, const coruja::list<Child>& children, 
     }
     return out;
 }
+
+template<typename OStream, typename T, typename CheckPolicy, typename P>
+inline OStream& out_children(OStream& out, const leaves_impl<T, CheckPolicy, P>& children, std::size_t level)
+{ return out_children_aux(out, children, level); }
+
+template<typename OStream, typename T, typename CheckPolicy, typename C, typename P>
+inline OStream& out_children(OStream& out, const branches_impl<T, CheckPolicy, C, P>& children, std::size_t level)
+{ return out_children_aux(out, children, level); }
 
 template<typename OStream, typename Node>
 inline OStream& handle_children_dispatch(OStream& out, const Node& node, detail::Expandable,
