@@ -1,7 +1,7 @@
 #pragma once
 
-#include <coruja/object/any_object_view.hpp>
-#include <coruja/object/lift.hpp>
+#include <coruja/object/view/any_object.hpp>
+#include <coruja/object/view/lift.hpp>
 #include <coruja/object/object.hpp>
 
 namespace saci { namespace tree {
@@ -38,7 +38,7 @@ public:
     //here. We need to compose this with the check attribute of a
     //child to achieve the visible of that child. Actually, coruja
     //doesn't support compositions between observables and observeds. 
-    coruja::any_object_view<bool> visible;
+    coruja::view::any_object<bool> visible;
 };
 
 template<typename Derived>
@@ -57,7 +57,7 @@ struct visibility<Derived, Checkable, void> {
     }
     
     coruja::object<bool> check{false};
-    coruja::any_object_view<bool> visible;
+    coruja::view::any_object<bool> visible;
 };
 
 template<typename Derived, typename Parent>
@@ -69,7 +69,7 @@ struct visibility<Derived, UnCheckable, Parent> {
     void update_parent_ptr(Parent& p)
     { visible = p.visible; }
     
-    coruja::any_object_view<bool> visible;
+    coruja::view::any_object<bool> visible;
 };
 
 template<typename Derived, typename Parent>
@@ -92,7 +92,7 @@ struct visibility<Derived, Checkable, Parent> {
     { visible = check && p.visible; }
     
     coruja::object<bool> check;
-    coruja::any_object_view<bool> visible;
+    coruja::view::any_object<bool> visible;
 };
 
 }}}

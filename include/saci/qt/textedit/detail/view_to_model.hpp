@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <coruja/object/any_object.hpp>
+#include <coruja/object/object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QObject>
 #include <QTextEdit>
@@ -20,13 +20,13 @@ class textedit_to_model : public QObject {
     Q_OBJECT
 public:
     textedit_to_model() = default;
-    textedit_to_model(coruja::any_object<std::string> pmodel,
+    textedit_to_model(coruja::object<std::string>& pmodel,
                       QTextEdit& pwidget)
-        : model(std::move(pmodel))
+        : model(pmodel)
         , widget(pwidget)
     {}
     virtual ~textedit_to_model() = default;
-    coruja::any_object<std::string> model;
+    coruja::object<std::string>& model;
     coruja::any_connection conn;
     QTextEdit& widget;
 public Q_SLOTS:

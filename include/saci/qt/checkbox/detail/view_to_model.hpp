@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <coruja/object/any_object.hpp>
+#include <coruja/object/object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QCheckBox>
 #include <QObject>
@@ -19,10 +19,10 @@ class checkbox_to_model : public QObject {
     Q_OBJECT
 public:
     checkbox_to_model() = default;
-    checkbox_to_model(coruja::any_object<bool> pmodel, QCheckBox&)
-        : model(std::move(pmodel)) {}
+    checkbox_to_model(coruja::object<bool>& pmodel, QCheckBox&)
+        : model(pmodel) {}
     virtual ~checkbox_to_model() = default;
-    coruja::any_object<bool> model;
+    coruja::object<bool>& model;
     coruja::any_connection conn;
 public Q_SLOTS:
     void propagates(int v)

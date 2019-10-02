@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <coruja/object/any_object.hpp>
+#include <coruja/object/object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QObject>
 #include <QRadioButton>
@@ -17,10 +17,10 @@ class radio_btn_to_model : public QObject {
     Q_OBJECT
 public:
     radio_btn_to_model() = default;
-    radio_btn_to_model(coruja::any_object<bool> pmodel, QRadioButton&)
-        : model(std::move(pmodel)) {}
+    radio_btn_to_model(coruja::object<bool>& pmodel, QRadioButton&)
+        : model(pmodel) {}
     virtual ~radio_btn_to_model() = default;
-    coruja::any_object<bool> model;
+    coruja::object<bool>& model;
     coruja::any_connection conn;
 public Q_SLOTS:
     void propagates(bool v)

@@ -9,7 +9,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <coruja/object/object.hpp>
-#include <coruja/object/transform.hpp>
+#include <coruja/object/view/transform.hpp>
 #include <saci/qt/checkbox/checkbox.hpp>
 #include <saci/qt/textedit/textedit.hpp>
 
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     
     window.show();
 
-    checkbox.enable(transform(name, [](std::string s){ return !s.empty(); }));
+    checkbox.enable(view::transform(name, [](std::string s){ return !s.empty(); }));
         
     model = true;
 

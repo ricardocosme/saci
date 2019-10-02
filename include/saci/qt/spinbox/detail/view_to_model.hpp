@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <coruja/object/any_object.hpp>
+#include <coruja/object/object.hpp>
 #include <coruja/support/signal/scoped_blocked_connection.hpp>
 #include <QObject>
 #include <QDoubleSpinBox>
@@ -17,10 +17,10 @@ class spinbox_to_model : public QObject {
     Q_OBJECT
 public:
     spinbox_to_model() = default;
-    spinbox_to_model(coruja::any_object<double> pmodel, QDoubleSpinBox&)
-        : model(std::move(pmodel)) {}
+    spinbox_to_model(coruja::object<double>& pmodel, QDoubleSpinBox&)
+        : model(pmodel) {}
     virtual ~spinbox_to_model() = default;
-    coruja::any_object<double> model;
+    coruja::object<double>& model;
     coruja::any_connection conn;
 public Q_SLOTS:
     void propagates(double v)
