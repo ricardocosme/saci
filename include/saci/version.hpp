@@ -6,4 +6,4 @@
 
 #pragma once
 
-#define SACI_VERSION "0.1.0_beta1"
+#define SACI_VERSION "0.1.0_beta2"
