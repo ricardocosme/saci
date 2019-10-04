@@ -18,10 +18,10 @@ struct erase_node {
     template<typename Node>
     void operator()(Node& node) const {
         delete node2item[&node];
-        visible_conns.erase(&node);
+        blockable_conns.erase(&node);
     }
     QTreeWidget& tree;
-    detail::node2conn& visible_conns;
+    detail::node2conn& blockable_conns;
     detail::node2item_t& node2item;
 };
 

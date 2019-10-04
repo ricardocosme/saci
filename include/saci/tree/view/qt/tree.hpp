@@ -4,10 +4,12 @@
 
 #include <saci/tree/view/qt/detail/erase_node.hpp>
 #include <saci/tree/view/qt/detail/insert_node.hpp>
-#include <saci/tree/view/qt/detail/item2check.hpp>
+#include <saci/tree/view/qt/detail/item2obool.hpp>
 #include <saci/tree/view/qt/detail/node2conn.hpp>
 #include <saci/tree/view/qt/detail/node2item.hpp>
 #include <saci/tree/view/qt/detail/propagates_check.hpp>
+#include <saci/tree/view/qt/detail/propagates_collapse.hpp>
+#include <saci/tree/view/qt/detail/propagates_expand.hpp>
 #include <saci/tree/view/qt/detail/remove_selected_nodes.hpp>
 
 #include <memory>
@@ -50,23 +52,31 @@ public:
     tree(Model& model, QTreeWidget& tree)
         : _model(&model)
         , _tree(&tree)
-        , _propagates_check(new detail::propagates_check(_item2check, _visible_conns))
+        , _propagates_check(new detail::propagates_check(_item2obool, _blockable_conns))
+        , _propagates_expand(new detail::propagates_expand(_item2expand, _blockable_conns))
+        , _propagates_collapse(new detail::propagates_collapse(_item2expand, _blockable_conns))
     {
         auto& rootitem = detail::insert_node<QTreeWidget>
-            (*_tree, _item2check, _node2item, _visible_conns, _conns)(model);
-        
+            (*_tree, _item2obool, _item2expand, _node2item, _blockable_conns, _conns)(model);
+
         _conns.push_back(
             model.children.for_each(
                 detail::insert_node<QTreeWidgetItem>
-                (rootitem, _item2check, _node2item, _visible_conns, _conns)));
+                (rootitem, _item2obool, _item2expand, _node2item, _blockable_conns, _conns)));
         
         _conns.emplace_back(
             model.children.before_erase(
-                detail::erase_node{*_tree, _visible_conns, _node2item}));
+                detail::erase_node{*_tree, _blockable_conns, _node2item}));
             
         QObject::connect
             (_tree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
              _propagates_check.get(), SLOT(reaction(QTreeWidgetItem*, int)));
+        QObject::connect
+            (_tree, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+             _propagates_expand.get(), SLOT(reaction(QTreeWidgetItem*)));
+        QObject::connect
+            (_tree, SIGNAL(itemCollapsed(QTreeWidgetItem*)),
+             _propagates_collapse.get(), SLOT(reaction(QTreeWidgetItem*)));
     }
 
     ///Visit each node with a function F
@@ -102,12 +112,14 @@ public:
     Model* _model{nullptr};
     QTreeWidget* _tree{nullptr};
 
-    detail::item2check_t _item2check;
+    detail::item2obool_t _item2obool, _item2expand;
     detail::node2item_t _node2item;
-    detail::node2conn _visible_conns;
+    detail::node2conn _blockable_conns;
     std::vector<coruja::scoped_any_connection> _conns;
     
     std::unique_ptr<detail::propagates_check> _propagates_check;
+    std::unique_ptr<detail::propagates_expand> _propagates_expand;
+    std::unique_ptr<detail::propagates_collapse> _propagates_collapse;
 };
 
 }}}}

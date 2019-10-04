@@ -31,6 +31,9 @@ std::string node_label(persons_t&)
 
 #include <saci/tree/view/qt/tree.hpp>
 
+inline std::string yesno(bool v)
+{ return v ? "yes" : "no"; }
+
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QDialog window;
@@ -60,10 +63,13 @@ int main(int argc, char** argv) {
     model.children.front().check = true;
     
     model.children.front().check.after_change([](bool v)
-    {std::cout << "front element check=" << v << std::endl;});
+    { std::cout << "front element checked: " << yesno(v) << std::endl; });
 
     saci::qt::experimental::push_btn remove("remove selected nodes", qpushbtn);
     remove.clicked([&]{ tree.remove_selected_nodes(); });
+
+    model.expand.for_each([](bool v)
+    { std::cout << "root expanded: " << yesno(v) << std::endl;});
     
     window.show();
     return app.exec();

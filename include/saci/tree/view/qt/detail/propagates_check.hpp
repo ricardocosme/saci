@@ -13,22 +13,22 @@ class propagates_check : public QObject {
     Q_OBJECT
 public:
     propagates_check(
-        item2check_t& n2i,
+        item2obool_t& n2i,
         node2conn& c)
-        : item2check(n2i)
+        : item2obool(n2i)
         , conns(c)
     {}
     virtual ~propagates_check() = default;
+    item2obool_t &item2obool;
+    node2conn& conns;
 public Q_SLOTS:
     void reaction(QTreeWidgetItem* item, int col = 0) {
-        auto& check = *item2check[item];
+        auto& check = *item2obool[item];
         //TODO: RAII?
         for(auto& conn : conns) conn.second.get().block();
         check = item->checkState(col) == 2 ? true : false;
         for(auto& conn : conns) conn.second.get().unblock();
     }
-    item2check_t& item2check;
-    node2conn& conns;
 };
 
 //TODO [REPLACE]: Link the moc in the build process

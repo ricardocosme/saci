@@ -1,7 +1,7 @@
 #pragma once
 
 #include <coruja/object/object.hpp>
-#include <saci/tree/view/qt/detail/item2check.hpp>
+#include <saci/tree/view/qt/detail/item2obool.hpp>
 #include <saci/tree/view/qt/detail/node2item.hpp>
 #include <saci/tree/view/qt/detail/node2conn.hpp>
 
@@ -39,23 +39,25 @@ template<typename Parent>
 struct insert_node {
     insert_node(
         Parent& p,
-        detail::item2check_t& i2c,
+        detail::item2obool_t& i2c,
+        detail::item2obool_t& i2e,
         detail::node2item_t& n2i,
         detail::node2conn& vc,
         std::vector<coruja::scoped_any_connection>& c)
         : parent(p)
-        , item2check(i2c)
+        , item2obool(i2c)
+        , item2expand(i2e)
         , node2item(n2i)
-        , visible_conns(vc)
+        , blockable_conns(vc)
         , conns(c)
     {}
 
 
     template<typename Node>
     void handle_check(QTreeWidgetItem& item, Node& node, Checkable) {
-        item2check[&item] = &node.check;
+        item2obool[&item] = &node.check;
 
-        visible_conns.emplace(&node,
+        blockable_conns.emplace(&node,
             node.visible.for_each([&](bool v)
             {item.setCheckState(0, v ? Qt::Checked : Qt::Unchecked);}));
      }
@@ -65,10 +67,23 @@ struct insert_node {
     { /*do nothing*/ }
     
     template<typename Node>
+    void handle_expand(QTreeWidgetItem& item, Node& node, saci::tree::detail::Expandable) {
+        item2expand[&item] = &node.expand;
+        blockable_conns.emplace(
+            &node,
+            node.expand.for_each([&](bool v){ item.setExpanded(v); }));
+     }
+
+    template<typename Node>
+    void handle_expand(QTreeWidgetItem& item, Node& node, saci::tree::detail::UnExpandable)
+    { /*do nothing*/ }
+    
+    template<typename Node>
     QTreeWidgetItem& operator()(Node& node)  {
         //parent has the ownership
         auto item = new QTreeWidgetItem{&parent};
         handle_check(*item, node, typename Node::check_t{});
+        handle_expand(*item, node, typename Node::expand_t{});
         node2item[&node] = item;
         handle_node_label(*item, conns, node_label(*(node.obj)));
 
@@ -76,9 +91,9 @@ struct insert_node {
     }
 
     Parent& parent;
-    detail::item2check_t& item2check;
+    detail::item2obool_t &item2obool, &item2expand;
     detail::node2item_t& node2item;
-    detail::node2conn& visible_conns;
+    detail::node2conn& blockable_conns;
     std::vector<coruja::scoped_any_connection>& conns;
 };
 

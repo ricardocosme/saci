@@ -8,7 +8,7 @@ namespace saci { namespace tree { namespace view { namespace qt {
 namespace detail {
 
 using node_ptr = void*;
-using item2check_t = std::unordered_map<QTreeWidgetItem*,
-                                       coruja::object<bool>*>;
+using item2obool_t = std::unordered_map<QTreeWidgetItem*,
+                                        coruja::object<bool>*>;
 
 }}}}}
