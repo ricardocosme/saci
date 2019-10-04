@@ -58,7 +58,7 @@ struct insert_node {
         item2obool[&item] = &node.check;
 
         blockable_conns.emplace(&node,
-            node.visible.for_each([&](bool v)
+            node.check.for_each([&](bool v)
             {item.setCheckState(0, v ? Qt::Checked : Qt::Unchecked);}));
      }
 
