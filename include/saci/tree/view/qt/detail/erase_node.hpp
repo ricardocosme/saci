@@ -2,6 +2,7 @@
 
 #include <coruja/object/object.hpp>
 #include <saci/tree/view/qt/detail/node2conn.hpp>
+#include <saci/tree/view/qt/detail/node2item.hpp>
 #include <string>
 
 namespace saci { namespace tree { namespace view { namespace qt {
@@ -16,15 +17,12 @@ inline std::string strip_node_label(std::string o)
 struct erase_node {
     template<typename Node>
     void operator()(Node& node) const {
-        //TODO: Obj2Item
-        auto items = tree.findItems(strip_node_label(node_label(*(node.obj))).c_str(),
-                                    Qt::MatchExactly);
-        delete items[0];
-
+        delete node2item[&node];
         visible_conns.erase(&node);
     }
     QTreeWidget& tree;
     detail::node2conn& visible_conns;
+    detail::node2item_t& node2item;
 };
 
 }}}}}

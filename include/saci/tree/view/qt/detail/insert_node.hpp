@@ -14,65 +14,68 @@ namespace detail {
 
 inline void handle_node_label(
     QTreeWidgetItem& item,
+    std::string s)
+{
+    item.setToolTip(0, s.c_str());
+    item.setText(0, s.c_str());
+}
+
+inline void handle_node_label(
+    QTreeWidgetItem& item,
+    std::vector<coruja::scoped_any_connection>&,
+    std::string s)
+{ handle_node_label(item, s); }
+
+inline void handle_node_label(
+    QTreeWidgetItem& item,
     std::vector<coruja::scoped_any_connection>& conns,
     coruja::object<std::string>& o)
 {
     return conns.emplace_back(
-        o.for_each([&item](std::string s)
-        {
-            item.setToolTip(0, s.c_str());
-            item.setText(0, s.c_str());
-        }));
+        o.for_each([&](std::string s){ handle_node_label(item, s); }));
 }
 
-inline void handle_node_label(
-    QTreeWidgetItem&,
-    std::vector<coruja::scoped_any_connection>&,
-    std::string)
-{}
-
+template<typename Parent>
 struct insert_node {
     insert_node(
-        QTreeWidget& w,
+        Parent& p,
         detail::item2check_t& i2c,
         detail::node2item_t& n2i,
         detail::node2conn& vc,
         std::vector<coruja::scoped_any_connection>& c)
-        : tree(w)
+        : parent(p)
         , item2check(i2c)
         , node2item(n2i)
         , visible_conns(vc)
         , conns(c)
     {}
-    
-    insert_node(const insert_node& rhs)
-        : tree(rhs.tree)
-        , item2check(rhs.item2check)
-        , node2item(rhs.node2item)
-        , visible_conns(rhs.visible_conns)
-        , conns(rhs.conns)
-    {
-    }
+
+
+    template<typename Node>
+    void handle_check(QTreeWidgetItem& item, Node& node, Checkable) {
+        item2check[&item] = &node.check;
+
+        visible_conns.emplace(&node,
+            node.visible.for_each([&](bool v)
+            {item.setCheckState(0, v ? Qt::Checked : Qt::Unchecked);}));
+     }
+
+    template<typename Node>
+    void handle_check(QTreeWidgetItem& item, Node& node, UnCheckable)
+    { /*do nothing*/ }
     
     template<typename Node>
-    void operator()(Node& node)  {
-        std::unique_ptr<QTreeWidgetItem> item(new QTreeWidgetItem);
-        item2check[item.get()] = &node.check;
-        node2item[&node] = item.get();
+    QTreeWidgetItem& operator()(Node& node)  {
+        //parent has the ownership
+        auto item = new QTreeWidgetItem{&parent};
+        handle_check(*item, node, typename Node::check_t{});
+        node2item[&node] = item;
         handle_node_label(*item, conns, node_label(*(node.obj)));
-        
-        auto& ritem = *item;
-        visible_conns.emplace(&node,
-            node.visible.for_each([&ritem](bool v)
-            {ritem.setCheckState(0, v ? Qt::Checked : Qt::Unchecked);}));
 
-        //TODO: node expansion
-        // node.expand.for_each([&ritem](bool v){ritem.setExpanded(v);});
-        
-        tree.addTopLevelItem(item.release());
+        return *item;
     }
 
-    QTreeWidget& tree;
+    Parent& parent;
     detail::item2check_t& item2check;
     detail::node2item_t& node2item;
     detail::node2conn& visible_conns;

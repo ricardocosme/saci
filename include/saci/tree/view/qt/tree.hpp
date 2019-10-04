@@ -52,14 +52,17 @@ public:
         , _tree(&tree)
         , _propagates_check(new detail::propagates_check(_item2check, _visible_conns))
     {
+        auto& rootitem = detail::insert_node<QTreeWidget>
+            (*_tree, _item2check, _node2item, _visible_conns, _conns)(model);
+        
         _conns.push_back(
             model.children.for_each(
-                detail::insert_node(*_tree, _item2check, _node2item,
-                                    _visible_conns, _conns)));
+                detail::insert_node<QTreeWidgetItem>
+                (rootitem, _item2check, _node2item, _visible_conns, _conns)));
         
         _conns.emplace_back(
             model.children.before_erase(
-                detail::erase_node{*_tree, _visible_conns}));
+                detail::erase_node{*_tree, _visible_conns, _node2item}));
             
         QObject::connect
             (_tree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
