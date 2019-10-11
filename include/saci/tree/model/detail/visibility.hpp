@@ -69,7 +69,8 @@ struct visibility<Derived, UnCheckable, Parent> {
     void update_parent_ptr(Parent& p)
     { visible = p.visible; }
     
-    coruja::view::any_object<bool> visible;
+    coruja::view::any_object<
+        bool, coruja::view::DisconnectOnDestruction> visible;
 };
 
 template<typename Derived, typename Parent>
@@ -92,7 +93,8 @@ struct visibility<Derived, Checkable, Parent> {
     { visible = check && p.visible; }
     
     coruja::object<bool> check;
-    coruja::view::any_object<bool> visible;
+    coruja::view::any_object<
+        bool, coruja::view::DisconnectOnDestruction> visible;
 };
 
 }}}
