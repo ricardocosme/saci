@@ -26,7 +26,11 @@ public Q_SLOTS:
         auto& check = *item2obool[item];
         //TODO: RAII?
         for(auto& conn : conns) conn.second.get().block();
-        check = item->checkState(col) == 2 ? true : false;
+        auto check_state = item->checkState(col) == 2 ? true : false;
+        //TODO: This conditional should be removed in the future when
+        //`after_change` going to be fixed.
+        if(check != check_state)
+            check = check_state;
         for(auto& conn : conns) conn.second.get().unblock();
     }
 };
