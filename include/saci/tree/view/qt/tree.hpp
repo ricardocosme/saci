@@ -57,16 +57,16 @@ public:
         , _propagates_collapse(new detail::propagates_collapse(_item2expand, _blockable_conns))
     {
         auto& rootitem = detail::insert_node<QTreeWidget>
-            (*_tree, _item2obool, _item2expand, _node2item, _blockable_conns, _conns)(model);
+            (*_tree, _item2obool, _item2expand, _node2item, _blockable_conns, _node2conns)(model);
 
         _conns.push_back(
             model.children.for_each(
                 detail::insert_node<QTreeWidgetItem>
-                (rootitem, _item2obool, _item2expand, _node2item, _blockable_conns, _conns)));
+                (rootitem, _item2obool, _item2expand, _node2item, _blockable_conns, _node2conns)));
         
         _conns.emplace_back(
             model.children.before_erase(
-                detail::erase_node{*_tree, _blockable_conns, _node2item}));
+                detail::erase_node{*_tree, _blockable_conns, _node2conns, _node2item}));
             
         QObject::connect
             (_tree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
@@ -114,7 +114,7 @@ public:
 
     detail::item2obool_t _item2obool, _item2expand;
     detail::node2item_t _node2item;
-    detail::node2conn _blockable_conns;
+    detail::node2conn _blockable_conns, _node2conns;
     std::vector<coruja::scoped_any_connection> _conns;
     
     std::unique_ptr<detail::propagates_check> _propagates_check;

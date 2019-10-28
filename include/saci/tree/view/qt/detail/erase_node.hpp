@@ -19,9 +19,10 @@ struct erase_node {
     void operator()(Node& node) const {
         delete node2item[&node];
         blockable_conns.erase(&node);
+        node2conns.erase(&node);
     }
     QTreeWidget& tree;
-    detail::node2conn& blockable_conns;
+    detail::node2conn &blockable_conns, &node2conns;
     detail::node2item_t& node2item;
 };
 

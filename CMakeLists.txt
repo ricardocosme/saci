@@ -3,6 +3,10 @@ project (saci_qt)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
+add_compile_options(
+    -Wno-strict-aliasing
+)
+
 include_directories(
     include
     ${CORUJA_ROOT}/include
