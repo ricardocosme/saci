@@ -70,5 +70,11 @@ target_link_libraries(qt_enable ${QT_LIBRARIES})
 list(APPEND MOCS ${CMAKE_CURRENT_BINARY_DIR}/checkbox_view_to_model.cpp
 ${CMAKE_CURRENT_BINARY_DIR}/textedit_view_to_model.cpp)
     
+add_executable(
+    qt_label
+    demo/label/qt/main.cpp
+)
+target_link_libraries(qt_label ${QT_LIBRARIES})
+
 add_library(saci_qt ${MOCS})
 target_include_directories(saci_qt PUBLIC include)
