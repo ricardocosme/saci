@@ -55,6 +55,7 @@ endmacro(add_qt_demo)
 
 add_qt_demo(checkbox)
 add_qt_demo(radio_btn)
+add_qt_demo(slider)
 add_qt_demo(spinbox)
 add_qt_demo(textedit)
 
