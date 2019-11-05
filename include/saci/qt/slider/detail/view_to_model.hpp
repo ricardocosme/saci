@@ -17,16 +17,17 @@ class slider_to_model : public QObject {
     Q_OBJECT
 public:
     slider_to_model() = default;
-    slider_to_model(coruja::object<int>& pmodel, QSlider&)
+    slider_to_model(coruja::object<double>& pmodel, QSlider&)
         : model(pmodel) {}
     virtual ~slider_to_model() = default;
-    coruja::object<int>& model;
+    coruja::object<double>& model;
     coruja::any_connection conn;
+    double step;                               
 public Q_SLOTS:
     void propagates(int v)
     {
         auto blk = coruja::make_scoped_blocked_connection(conn);
-        model = v;
+        model = v * step;
     }
 };
 

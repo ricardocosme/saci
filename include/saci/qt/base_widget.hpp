@@ -18,7 +18,9 @@ class base_widget
 {
     QtWidget* _widget{nullptr};
     coruja::scoped_any_connection _model_to_view_conn, _enable_conn;
+protected:    
     ViewToModel _view_to_model;
+private:    
     std::string _sig, _slot;
 
     void connect_view(const char* sig, const char* slot)

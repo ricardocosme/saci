@@ -18,20 +18,18 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QMainWindow window;
 
-    coruja::object<int> model{0};
+    coruja::object<double> model{0};
     
-    model.for_each([](int v)
+    model.for_each([](double v)
     { std::cout << "model is " << v << std::endl; });
 
     QSlider widget(Qt::Horizontal, &window);
-    widget.setMinimum(0);
-    widget.setMaximum(100);
     
-    saci::qt::slider slider(model, widget);
+    saci::qt::slider slider(model, widget, 255.f, 0.5f);
         
     window.show();
 
-    model = 75;
+    model = 150.5;
     
     return app.exec();
 }

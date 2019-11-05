@@ -9,6 +9,7 @@
 #include "saci/qt/base_widget.hpp"
 #include "saci/qt/slider/detail/view_to_model.hpp"
 
+#include <cmath>
 #include <QSlider>
 
 namespace saci { namespace qt { 
@@ -16,25 +17,32 @@ namespace saci { namespace qt {
 struct slider
     : base_widget<
           QSlider,
-          int,
+          double,
           detail::slider_to_model
     >
 {
     using base = base_widget<QSlider,
-                             int,
+                             double,
                              detail::slider_to_model>;
     
     slider() = default;
 
     template<typename ObservableObject>
-    slider(ObservableObject& model, QSlider& widget)
+    slider(ObservableObject& model,
+           QSlider& widget,
+           double max,
+           double step = 0.05f)
         : base(model,
                widget,
                SIGNAL(valueChanged(int)),
                SLOT(propagates(int)),
-               [](QSlider& widget, int v)
-               { widget.setValue(v); })
-    {}
+               [step](QSlider& widget, double v)
+               { widget.setValue(std::round(v/step)); })
+    {
+        //TODO: Minimum value
+        widget.setMaximum(std::round(max/step));
+        _view_to_model.step = step;
+    }
 };
 
 }}
