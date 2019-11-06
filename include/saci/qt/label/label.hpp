@@ -17,7 +17,7 @@ namespace saci { namespace qt {
 class label
 {
     QLabel* _widget{nullptr};
-    coruja::scoped_any_connection _enable_conn;
+    coruja::scoped_any_connection _model_to_view_conn, _enable_conn;
 public:    
     label() = default;
 
@@ -25,7 +25,8 @@ public:
     label(ObservableObject& model, QLabel& widget)
         : _widget(&widget)
     {
-        model.for_each([&](std::string v){ widget.setText(v.c_str()); });
+        _model_to_view_conn = model.for_each(
+            [&](std::string v){ widget.setText(v.c_str()); });
     }
     
     const QLabel& widget() const noexcept
